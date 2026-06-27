@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nattudars — RSC Bahrain</title>
+  <meta name="description"
+    content="Nattudars Registration for RSC Bahrain. Public registration open to all. Committee dashboards require login." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Malayalam:wght@100..900&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --accent: #533AB7;
+      --al: #ede9f9;
+      --ad: #3d2b8e;
+      --b: 0.5px solid #e2e2e2;
+      --text: #111111;
+      --t2: #6b6b6b;
+      --mu: #999999;
+      --bg: #f5f5f7;
+      --card: #ffffff;
+      --green: #15803d;
+      --gbg: #dcfce7;
+      --red: #dc2626;
+      --rbg: #fee2e2;
+      --amber: #92400e;
+      --abg: #fef3c7;
+      --r: 10px;
+      --rs: 6px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .hdr {
+      background: var(--card);
+      border-bottom: var(--b);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .hdr-in {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 52px;
+      gap: 12px;
+    }
+
+    .brand {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--bg);
+      border: var(--b);
+      border-radius: 8px;
+      padding: 3px;
+    }
+
+    .tab {
+      font-size: 13px;
+      font-weight: 500;
+      padding: 5px 16px;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--t2);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .tab.on {
+      background: var(--card);
+      color: var(--accent);
+      border: var(--b);
+    }
+
+    .pg {
+      display: none;
+    }
+
+    .pg.on {
+      display: block;
+    }
+
+    .av {
+      display: none;
+    }
+
+    .av.on {
+      display: block;
+    }
+
+    .wrap {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 28px 16px 56px;
+    }
+
+    .crd {
+      background: var(--card);
+      border: var(--b);
+      border-radius: var(--r);
+      padding: 28px;
+    }
+
+    .rhd {
+      text-align: center;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: var(--b);
+    }
+
+    .rtl {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.5px;
+      line-height: 1.2;
+    }
+
+    .rsb {
+      font-size: 15px;
+      color: var(--t2);
+      margin-top: 6px;
+      font-weight: 500;
+    }
+
+    .rdsc {
+      font-size: 13px;
+      color: var(--mu);
+      margin-top: 5px;
+    }
+
+    .fg {
+      margin-bottom: 18px;
+    }
+
+    .fr {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--t2);
+      margin-bottom: 6px;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    label .rq {
+      color: var(--accent);
+      margin-left: 2px;
+    }
+
+    input[type=text],
+    input[type=tel],
+    input[type=password],
+    select {
+      width: 100%;
+      padding: 9px 12px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--card);
+      border: 0.5px solid #c8c8c8;
+      border-radius: var(--rs);
+      outline: none;
+      transition: border-color 0.15s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--accent);
+    }
+
+    input.err {
+      border-color: var(--red);
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+      cursor: pointer;
+    }
+
+    .ferr {
+      font-size: 11px;
+      color: var(--red);
+      margin-top: 4px;
+      display: none;
+    }
+
+    .ferr.show {
+      display: block;
+    }
+
+    .btnp {
+      width: 100%;
+      padding: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--rs);
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.15s;
+    }
+
+    .btnp:hover {
+      background: var(--ad);
+    }
+
+    .bnr {
+      display: none;
+      padding: 12px 16px;
+      border-radius: var(--rs);
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 18px;
+      border: 0.5px solid transparent;
+    }
+
+    .bnr.ok {
+      display: block;
+      background: var(--gbg);
+      color: var(--green);
+      border-color: #86efac;
+    }
+
+    .lwrap {
+      display: flex;
+      justify-content: center;
+      padding: 56px 16px;
+      min-height: calc(100vh - 52px);
+    }
+
+    .lcrd {
+      background: var(--card);
+      border: var(--b);
+      border-radius: var(--r);
+      padding: 36px 32px;
+      width: 100%;
+      max-width: 400px;
+      align-self: flex-start;
+    }
+
+    .lico {
+      font-size: 36px;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .lcrd h1 {
+      font-size: 20px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .lcrd .sub {
+      font-size: 13px;
+      color: var(--mu);
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .lerr {
+      background: var(--rbg);
+      color: var(--red);
+      border: 0.5px solid #fca5a5;
+      border-radius: var(--rs);
+      padding: 10px 14px;
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+
+    .lhint {
+      margin-top: 18px;
+      padding: 12px 14px;
+      background: var(--bg);
+      border-radius: var(--rs);
+      border: var(--b);
+    }
+
+    .lhint p {
+      font-size: 11px;
+      color: var(--mu);
+      margin-bottom: 6px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .hr {
+      font-size: 12px;
+      color: var(--t2);
+      margin-top: 4px;
+    }
+
+    .hr code {
+      background: var(--card);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 11px;
+      border: var(--b);
+    }
+
+    .rbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding: 12px 16px;
+      background: var(--card);
+      border: var(--b);
+      border-radius: var(--r);
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .rinfo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .bdg {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+
+    .bu {
+      background: var(--al);
+      color: var(--accent);
+      border: 0.5px solid #c4b5f4;
+    }
+
+    .bs {
+      background: var(--abg);
+      color: var(--amber);
+      border: 0.5px solid #fcd34d;
+    }
+
+    .ba {
+      background: var(--rbg);
+      color: var(--red);
+      border: 0.5px solid #fca5a5;
+    }
+
+    .rname {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .blo {
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: inherit;
+      border-radius: var(--rs);
+      border: var(--b);
+      background: var(--bg);
+      color: var(--t2);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .blo:hover {
+      background: #ececec;
+    }
+
+    .stl {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--mu);
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      margin-top: 28px;
+    }
+
+    .stl:first-of-type {
+      margin-top: 0;
+    }
+
+    .sg {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .sc {
+      background: var(--card);
+      border: var(--b);
+      border-radius: var(--r);
+      padding: 20px 16px;
+      text-align: center;
+    }
+
+    .sv {
+      font-size: 30px;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .sl {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--mu);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 6px;
+    }
+
+    .chc {
+      background: var(--card);
+      border: var(--b);
+      border-radius: var(--r);
+      padding: 20px 22px;
+    }
+
+    .br {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .br:last-child {
+      margin-bottom: 0;
+    }
+
+    .bl {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--t2);
+      width: 120px;
+      flex-shrink: 0;
+      text-align: right;
+      text-transform: uppercase;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .bl.me {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .bt {
+      flex: 1;
+      background: var(--bg);
+      border-radius: 3px;
+      height: 22px;
+      border: var(--b);
+      overflow: hidden;
+    }
+
+    .bf {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 3px;
+    }
+
+    .bf.dm {
+      background: #c4b5f4;
+    }
+
+    .bc {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+      width: 26px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .ec {
+      font-size: 13px;
+      color: var(--mu);
+      text-align: center;
+      padding: 24px 0;
+    }
+
+    .tcrd {
+      background: var(--card);
+      border: var(--b);
+      border-radius: var(--r);
+      overflow: hidden;
+    }
+
+    .ttb {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      border-bottom: var(--b);
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tttl {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--mu);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .tact {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .bsm {
+      padding: 6px 13px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: inherit;
+      border-radius: var(--rs);
+      border: var(--b);
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+
+    .bex {
+      background: var(--al);
+      color: var(--accent);
+      border-color: #c4b5f4;
+    }
+
+    .bex:hover {
+      background: #ddd5f7;
+    }
+
+    .bdn {
+      background: var(--rbg);
+      color: var(--red);
+      border-color: #fca5a5;
+    }
+
+    .bdn:hover {
+      background: #fecaca;
+    }
+
+    .fsel {
+      padding: 5px 28px 5px 10px;
+      font-size: 12px;
+      font-family: inherit;
+      border-radius: var(--rs);
+      border: 0.5px solid #c8c8c8;
+      color: var(--text);
+      background: var(--card);
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .tw {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    thead th {
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--mu);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: var(--b);
+      white-space: nowrap;
+      background: #fafafa;
+    }
+
+    tbody td {
+      padding: 11px 14px;
+      border-bottom: var(--b);
+      vertical-align: middle;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background: #fafafa;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--al);
+      color: var(--accent);
+      border: 0.5px solid #c4b5f4;
+      white-space: nowrap;
+    }
+
+    .tm {
+      color: var(--mu);
+      font-size: 12px;
+    }
+
+    .et {
+      text-align: center;
+      padding: 32px;
+      color: var(--mu);
+      font-size: 13px;
+    }
+
+    .ic {
+      color: var(--mu);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .malayalam {
+      font-family: 'Noto Serif Malayalam', serif;
+    }
+
+    @media (max-width: 600px) {
+      .fr {
+        grid-template-columns: 1fr;
+        gap: 0;
+        margin-bottom: 0;
+      }
+
+      .fr .fg {
+        margin-bottom: 18px;
+      }
+
+      .sg {
+        gap: 8px;
+      }
+
+      .sc {
+        padding: 14px 8px;
+      }
+
+      .sv {
+        font-size: 22px;
+      }
+
+      .sl {
+        font-size: 9px;
+      }
+
+      .crd,
+      .lcrd {
+        padding: 20px 16px;
+      }
+
+      .bl {
+        width: 80px;
+        font-size: 10px;
+      }
+
+      .tab {
+        padding: 5px 10px;
+        font-size: 12px;
+      }
+
+      .ttb {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .sg {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 200;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.on {
+      display: flex;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="hdr" role="banner">
+    <div class="hdr-in">
+      <div class="brand malayalam">നാട്ടു ദർസ്</div>
+      <div class="tabs" role="tablist">
+        <button class="tab on" id="tab-r" role="tab" aria-selected="true" onclick="sTab('r')">&#128203;
+          Register</button>
+        <button class="tab" id="tab-a" role="tab" aria-selected="false" onclick="sTab('a')">&#128274; Admin</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- REGISTER PAGE (PUBLIC) -->
+  <main id="pg-r" class="pg on" role="tabpanel">
+    <div class="wrap">
+      <div class="crd">
+        <div class="rhd">
+          <div class="rtl malayalam">നാട്ടു ദർസ്</div>
+          <div class="rsb">&#1575;&#1604;&#1589;&#1601;&#1577; &#8212; RSC Bahrain</div>
+          <div class="rdsc malayalam" style="font-size: 14px; margin-top: 8px;">സുൽത്താനുൽ ഉലമയുടെ കിതാബ് ഓതി
+            പഠിക്കുന്നു.</div>
+        </div>
+        <div class="bnr" id="fbnr" role="alert" aria-live="polite"></div>
+        <form id="rfm" novalidate>
+          <div class="fg">
+            <label for="fn">Name <span class="rq">*</span></label>
+            <input type="text" id="fn" placeholder="Full name" autocomplete="name" required />
+            <div class="ferr" id="en">Name is required.</div>
+          </div>
+          <div class="fr">
+            <div class="fg">
+              <label for="fm">Mobile Number</label>
+              <input type="tel" id="fm" placeholder="e.g. +973XXXXXXXX"
+                oninput="this.value = this.value.replace(/[^0-9+]/g, '')" maxlength="15" />
+            </div>
+            <div class="fg">
+              <label for="fw">WhatsApp Number <span class="rq">*</span></label>
+              <input type="tel" id="fw" placeholder="e.g. +973XXXXXXXX" required
+                oninput="this.value = this.value.replace(/[^0-9+]/g, '')" maxlength="15" />
+              <div class="ferr" id="ew">WhatsApp number is required.</div>
+            </div>
+          </div>
+          <div class="fr">
+            <div class="fg">
+              <label for="fs">Sector</label>
+              <select id="fs">
+                <option value="">Choose...</option>
+                <option>GUDAIBIYA</option>
+                <option>CASENO</option>
+                <option>HIDD</option>
+                <option>JUFFAIR</option>
+                <option>SALMABAD</option>
+                <option>SALMANIYA</option>
+                <option>BUDAYYA</option>
+                <option>KHALEEFA</option>
+                <option>SANAD</option>
+                <option>HAMAD TOWN</option>
+                <option>ISA TOWN</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label for="fu">Unit</label>
+              <select id="fu" disabled>
+                <option value="">Choose Sector first...</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btnp">Register Now</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- ADMIN PAGE -->
+  <div id="pg-a" class="pg" role="tabpanel">
+
+    <!-- LOGIN VIEW -->
+    <div id="av-l" class="av on">
+      <div class="lwrap">
+        <div class="lcrd">
+          <div class="lico">&#128274;</div>
+          <h1>Committee Login</h1>
+          <p class="sub">Sign in to access your dashboard</p>
+          <div id="lerr" class="lerr" hidden></div>
+          <form id="lfm" novalidate>
+            <div class="fg">
+              <label for="lu">Username</label>
+              <input type="text" id="lu" placeholder="Username" autocomplete="off" spellcheck="false" />
+            </div>
+            <div class="fg">
+              <label for="lp">Password</label>
+              <input type="password" id="lp" placeholder="Password" autocomplete="current-password" />
+            </div>
+            <button type="submit" class="btnp">Login</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- UNIT DASHBOARD -->
+    <div id="av-unit" class="av">
+      <div class="wrap">
+        <div class="rbar">
+          <div class="rinfo"><span class="bdg bu">Unit Committee</span><span class="rname" id="urn"></span></div>
+          <button class="blo" onclick="doOut()">Logout</button>
+        </div>
+        <div class="stl">My Unit Overview</div>
+        <div class="sg" style="grid-template-columns: repeat(2, 1fr);">
+          <div class="sc">
+            <div class="sv" id="us1">0</div>
+            <div class="sl">My Registrations</div>
+          </div>
+          <div class="sc">
+            <div class="sv" id="us2">0</div>
+            <div class="sl">Sector Total</div>
+          </div>
+        </div>
+        <div class="stl">Daily Registration Trend</div>
+        <div class="chc">
+          <div id="uch2"></div>
+        </div>
+        <div class="stl">My Unit Registrations</div>
+        <div class="tcrd">
+          <div class="ttb">
+            <div class="tttl" id="uttl">Registrations</div>
+          </div>
+          <div class="tw">
+            <table aria-label="Unit registrations">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th>Mobile</th>
+                  <th>WhatsApp</th>
+                  <th>Date</th>
+                  <th style="text-align:right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="utb"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTOR DASHBOARD -->
+    <div id="av-sector" class="av">
+      <div class="wrap">
+        <div class="rbar">
+          <div class="rinfo"><span class="bdg bs">Sector Committee</span><span class="rname" id="srn"></span></div>
+          <button class="blo" onclick="doOut()">Logout</button>
+        </div>
+        <div class="stl">Sector Overview</div>
+        <div class="sg">
+          <div class="sc">
+            <div class="sv" id="ss1">0</div>
+            <div class="sl">Total Registered</div>
+          </div>
+          <div class="sc">
+            <div class="sv" id="ss2">0</div>
+            <div class="sl">Units Active</div>
+          </div>
+          <div class="sc">
+            <div class="sv" id="ss3">0</div>
+            <div class="sl">Avg per Unit</div>
+          </div>
+        </div>
+        <div class="stl">Unit-wise Progress Comparison</div>
+        <div class="chc">
+          <div id="sch"></div>
+        </div>
+        <div class="stl">Registrations by Unit</div>
+        <div class="tcrd">
+          <div class="ttb">
+            <div class="tttl">Registration List</div>
+            <div class="tact"><select id="sfl" class="fsel" onchange="rSecTbl()">
+                <option value="">All Units</option>
+              </select></div>
+          </div>
+          <div class="tw">
+            <table aria-label="Sector registrations">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th>Mobile</th>
+                  <th>WhatsApp</th>
+                  <th>Unit</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="stb"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN DASHBOARD -->
+    <div id="av-admin" class="av">
+      <div class="wrap">
+        <div class="rbar">
+          <div class="rinfo"><span class="bdg ba">RSC Bahrain</span><span class="rname">Full Access</span></div>
+          <button class="blo" onclick="doOut()">Logout</button>
+        </div>
+        <div class="stl">Overview</div>
+        <div class="sg">
+          <div class="sc">
+            <div class="sv" id="as1">0</div>
+            <div class="sl">Total Registered</div>
+          </div>
+          <div class="sc">
+            <div class="sv" id="as2">0</div>
+            <div class="sl">Sectors Active</div>
+          </div>
+          <div class="sc">
+            <div class="sv" id="as3">0</div>
+            <div class="sl">Units Active</div>
+          </div>
+        </div>
+        <div class="stl">Registrations by Sector</div>
+        <div class="chc">
+          <div id="ach1"></div>
+        </div>
+        <div class="stl">Registrations by Unit</div>
+        <div class="chc">
+          <div id="ach2"></div>
+        </div>
+        <div class="stl">All Registrations</div>
+        <div class="tcrd">
+          <div class="ttb">
+            <div class="tttl">Registration List</div>
+            <div class="tact">
+              <a id="shl" href="#" target="_blank" class="bsm bex"
+                style="text-decoration:none;display:none;align-items:center;justify-content:center;margin-right:8px;">Open
+                Google Sheet</a>
+              <button class="bsm bex" onclick="expCSV()">Download CSV</button>
+              <button class="bsm bdn" onclick="clrAll()">Clear All</button>
+            </div>
+          </div>
+          <div class="tw">
+            <table aria-label="All registrations">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th>Mobile</th>
+                  <th>WhatsApp</th>
+                  <th>Sector</th>
+                  <th>Unit</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="atb"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- EDIT MODAL -->
+  <div id="edit-modal" class="modal">
+    <div class="lcrd" style="max-width:450px; background:#fff; padding:28px;">
+      <h2 style="font-size:18px; font-weight:700; margin-bottom:18px; text-align:center;">Edit Registration</h2>
+      <form id="efm" novalidate>
+        <input type="hidden" id="e-id" />
+        <div class="fg">
+          <label for="e-name">Name <span class="rq">*</span></label>
+          <input type="text" id="e-name" required />
+        </div>
+        <div class="fg">
+          <label for="e-mobile">Mobile Number</label>
+          <input type="tel" id="e-mobile" placeholder="e.g. +973XXXXXXXX"
+            oninput="this.value = this.value.replace(/[^0-9+]/g, '')" maxlength="15" />
+        </div>
+        <div class="fg">
+          <label for="e-whatsapp">WhatsApp Number <span class="rq">*</span></label>
+          <input type="tel" id="e-whatsapp" placeholder="e.g. +973XXXXXXXX" required
+            oninput="this.value = this.value.replace(/[^0-9+]/g, '')" maxlength="15" />
+        </div>
+        <div style="display:flex; gap:10px; margin-top:20px;">
+          <button type="submit" class="btnp" style="flex:1; margin-top:0;">Save</button>
+          <button type="button" class="blo" style="flex:1;" onclick="closeEditModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    var SCRIPT_URL = https://script.google.com/macros/s/AKfycbyxfC1PW1r6LTNaaR8fIVrKHNa8TiSTLD_OgZi56zmmchPDDmR41EAdaF_7l0rM7KfT/exec
+    var SPREADSHEET_URL = ''; https://docs.google.com/spreadsheets/d/1iPG9HTLKlMls9L2_Ve0SGQj5mP52t827FRzm0QZsllk/edit?gid=0#gid=0
+    var LS = 'nattudars_regs', SS = 'nattudars_session';
+    var SU = {
+      'BUDAYYA': ['SAAR', 'DIRAZ', 'BUDAYYA CITY', 'JIDHAFS'],
+      'SALMABAD': ['TUBLI', 'KHAMIS', 'ZAYED TOWN', 'SALMABAD CITY'],
+      'SALMANIYA': ['SALMANIYA CITY', 'GAFOOL', 'CENTRAL MARKET', 'MANAMA SOUQ', 'BABUL BAHRAIN'],
+      'KHALEEFA': ['BUKHUWARA', 'WEST RIFFA', 'EAST RIFFA', 'POLICE STATION'],
+      'SANAD': ['ASKER', 'SITRA', 'HAJIYATH', 'NUWAIDRAT'],
+      'HAMAD TOWN': ['DARUL KHULAIB', 'ZALLAQ', 'HAMAD TOWN CITY'],
+      'ISA TOWN': ['JARDAB', 'JIDHALI', 'ISA TOWN CITY'],
+      'GUDAIBIYA': ['RAS RUMAN', 'LAST CHANCE', 'EXHIBITION', 'HOORA', 'ZAINAL MART'],
+      'HIDD': ['ARAD', 'NEW HIDD', 'GALALY'],
+      'JUFFAIR': ['ADLIYA', 'JAZEERA', 'UM AL HASAM'],
+      'CASENO': ['BUSAITHEEN', 'HALA', 'MUHARRAQ SOUQ', 'AIRPORT']
+    };
+    var CR = {};
+    CR['ADMIN'] = { pw: 'admin', role: 'admin' };
+    CR['RSCBAHRAIN'] = { pw: 'rscbahrain', role: 'admin' };
+    var _sk = Object.keys(SU);
+    for (var _i = 0; _i < _sk.length; _i++) {
+      var _s = _sk[_i];
+      CR['SC' + _s] = { pw: _s.toLowerCase(), role: 'sector', sector: _s };
+      var _us = SU[_s];
+      for (var _j = 0; _j < _us.length; _j++) {
+        var _u = _us[_j];
+        CR['UN' + _u] = { pw: _u.toLowerCase(), role: 'unit', unit: _u, sector: _s };
+      }
+    }
+    function gR() { try { return JSON.parse(localStorage.getItem(LS)) || []; } catch (e) { return []; } }
+    function sR(a) { localStorage.setItem(LS, JSON.stringify(a)); }
+    function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+    function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+    function nm(s) { return String(s || '').toUpperCase().trim(); }
+    function gSs() { try { return JSON.parse(sessionStorage.getItem(SS)) || null; } catch (e) { return null; } }
+    function sSs(o) { sessionStorage.setItem(SS, JSON.stringify(o)); }
+    function cSs() { sessionStorage.removeItem(SS); }
+    function syncData(cb) {
+      if (!SCRIPT_URL) { if (cb) cb(); return; }
+      fetch(SCRIPT_URL)
+        .then(function (r) { return r.json(); })
+        .then(function (d) { if (Array.isArray(d)) sR(d); if (cb) cb(); })
+        .catch(function (e) { console.error(e); if (cb) cb(); });
+    }
+
+    function sTab(t) {
+      document.querySelectorAll('.pg').forEach(function (p) { p.classList.remove('on'); });
+      document.querySelectorAll('.tab').forEach(function (b) { b.classList.remove('on'); b.setAttribute('aria-selected', 'false'); });
+      document.getElementById('pg-' + t).classList.add('on');
+      var btn = document.getElementById('tab-' + t); btn.classList.add('on'); btn.setAttribute('aria-selected', 'true');
+      if (t === 'a') {
+        var ss = gSs();
+        if (!ss) {
+          sView('l');
+        } else {
+          sView(ss.role);
+          syncData(function () { rRole(ss); });
+        }
+      }
+    }
+    function sView(v) {
+      document.querySelectorAll('.av').forEach(function (el) { el.classList.remove('on'); });
+      var el = document.getElementById('av-' + v); if (el) el.classList.add('on');
+    }
+    document.getElementById('lfm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var u = document.getElementById('lu').value.trim().toUpperCase();
+      var p = document.getElementById('lp').value;
+      var err = document.getElementById('lerr');
+      var c = CR[u];
+      if (!c || c.pw !== p) { err.textContent = 'Invalid username or password. Please try again.'; err.hidden = false; return; }
+      err.hidden = true;
+      var ss = { role: c.role };
+      if (c.sector) ss.sector = c.sector;
+      if (c.unit) ss.unit = c.unit;
+      sSs(ss);
+      document.getElementById('lfm').reset();
+      syncData(function () {
+        sView(c.role);
+        rRole(ss);
+      });
+    });
+    function doOut() { cSs(); sView('l'); document.getElementById('lu').value = ''; document.getElementById('lp').value = ''; document.getElementById('lerr').hidden = true; }
+    function rRole(ss) { if (ss.role === 'unit') rUnit(ss); else if (ss.role === 'sector') rSec(ss); else if (ss.role === 'admin') rAdm(); }
+
+    function rUnit(ss) {
+      var un = ss.unit, sn = ss.sector;
+      document.getElementById('urn').textContent = un + ' — ' + sn + ' Sector';
+      document.getElementById('uttl').textContent = un + ' Registrations';
+      var regs = gR();
+      var myR = regs.filter(function (r) { return nm(r.unit) === nm(un); });
+      var sR2 = regs.filter(function (r) { return nm(r.sector) === nm(sn); });
+      document.getElementById('us1').textContent = myR.length;
+      document.getElementById('us2').textContent = sR2.length;
+      var dy = {}; myR.forEach(function (r) { if (r.date) dy[r.date] = (dy[r.date] || 0) + 1; });
+      var dts = Object.keys(dy).sort(function (a, b) { var pa = a.split('/'), pb = b.split('/'); return new Date(pa[2], pa[1] - 1, pa[0]) - new Date(pb[2], pb[1] - 1, pb[0]); });
+      var c2 = document.getElementById('uch2');
+      if (!dts.length) { c2.innerHTML = '<div class="ec">No trend data yet.</div>'; }
+      else { var mx2 = Math.max.apply(null, dts.map(function (d) { return dy[d]; })) || 1; c2.innerHTML = dts.map(function (d) { var cnt = dy[d], pct = (cnt / mx2 * 100).toFixed(1); return '<div class="br"><div class="bl" style="width:90px">' + esc(d) + '</div><div class="bt"><div class="bf" style="width:' + pct + '%"></div></div><div class="bc">' + cnt + '</div></div>'; }).join(''); }
+      var tb = document.getElementById('utb'), dp = myR.slice().reverse();
+      if (!dp.length) { tb.innerHTML = '<tr><td colspan="6" class="et">No registrations for this unit yet.</td></tr>'; }
+      else { tb.innerHTML = dp.map(function (r, i) { return '<tr><td class="ic tm">' + (i + 1) + '</td><td>' + esc(r.name) + '</td><td class="tm">' + (esc(r.mobile) || '—') + '</td><td>' + esc(r.whatsapp) + '</td><td class="tm">' + esc(r.date) + '</td><td style="text-align:right;white-space:nowrap;"><button class="bsm bex" style="margin-right:4px;" onclick="editReg(\'' + r.id + '\')">Edit</button><button class="bsm bdn" onclick="deleteReg(\'' + r.id + '\')">Delete</button></td></tr>'; }).join(''); }
+    }
+
+    var _ss2 = null;
+    function rSec(ss) {
+      _ss2 = ss; var sn = ss.sector;
+      document.getElementById('srn').textContent = sn + ' Sector';
+      var regs = gR(), units = SU[sn] || [];
+      var sel = document.getElementById('sfl');
+      sel.innerHTML = '<option value="">All Units</option>';
+      units.forEach(function (u) { var o = document.createElement('option'); o.value = u; o.textContent = u; sel.appendChild(o); });
+      var sRgs = regs.filter(function (r) { return nm(r.sector) === nm(sn); });
+      var uc = {}; units.forEach(function (u) { uc[u] = 0; });
+      sRgs.forEach(function (r) { units.forEach(function (u) { if (nm(r.unit) === nm(u)) uc[u]++; }); });
+      var act = units.filter(function (u) { return uc[u] > 0; }).length;
+      var avg = units.length > 0 ? Math.round(sRgs.length / units.length) : 0;
+      document.getElementById('ss1').textContent = sRgs.length;
+      document.getElementById('ss2').textContent = act + ' / ' + units.length;
+      document.getElementById('ss3').textContent = avg;
+      var srt = units.slice().sort(function (a, b) { return uc[b] - uc[a]; });
+      var mx = Math.max.apply(null, srt.map(function (u) { return uc[u]; })) || 1;
+      document.getElementById('sch').innerHTML = srt.map(function (u) { var cnt = uc[u], pct = (cnt / mx * 100).toFixed(1); return '<div class="br"><div class="bl">' + esc(u) + '</div><div class="bt"><div class="bf" style="width:' + pct + '%"></div></div><div class="bc">' + cnt + '</div></div>'; }).join('');
+      rSecTbl();
+    }
+    function rSecTbl() {
+      if (!_ss2) return;
+      var sn = _ss2.sector, fu = document.getElementById('sfl').value;
+      var regs = gR();
+      var sRgs = regs.filter(function (r) { return nm(r.sector) === nm(sn); });
+      if (fu) sRgs = sRgs.filter(function (r) { return nm(r.unit) === nm(fu); });
+      var dp = sRgs.slice().reverse(), tb = document.getElementById('stb');
+      if (!dp.length) { tb.innerHTML = '<tr><td colspan="6" class="et">No registrations' + (fu ? ' for ' + esc(fu) : '') + ' yet.</td></tr>'; return; }
+      tb.innerHTML = dp.map(function (r, i) { return '<tr><td class="ic tm">' + (i + 1) + '</td><td>' + esc(r.name) + '</td><td class="tm">' + (esc(r.mobile) || '—') + '</td><td>' + esc(r.whatsapp) + '</td><td><span class="pill">' + esc(r.unit || '—') + '</span></td><td class="tm">' + esc(r.date) + '</td></tr>'; }).join('');
+    }
+
+    function rAdm() {
+      var lk = document.getElementById('shl');
+      if (typeof SPREADSHEET_URL !== 'undefined' && SPREADSHEET_URL) { lk.href = SPREADSHEET_URL; lk.style.display = 'inline-flex'; } else { lk.style.display = 'none'; }
+      var regs = gR(), sS = {}, uS = {};
+      regs.forEach(function (r) { if (r.sector) sS[r.sector] = 1; if (r.unit) uS[r.unit] = 1; });
+      document.getElementById('as1').textContent = regs.length;
+      document.getElementById('as2').textContent = Object.keys(sS).length;
+      document.getElementById('as3').textContent = Object.keys(uS).length;
+      var sc = {}; regs.forEach(function (r) { if (r.sector) sc[r.sector] = (sc[r.sector] || 0) + 1; }); dCh('ach1', sc);
+      var uc = {}; regs.forEach(function (r) { if (r.unit) uc[r.unit] = (uc[r.unit] || 0) + 1; }); dCh('ach2', uc);
+      var tb = document.getElementById('atb');
+      if (!regs.length) { tb.innerHTML = '<tr><td colspan="7" class="et">No registrations yet.</td></tr>'; return; }
+      var dp = regs.slice().reverse();
+      tb.innerHTML = dp.map(function (r, i) { return '<tr><td class="ic tm">' + (i + 1) + '</td><td>' + esc(r.name) + '</td><td class="tm">' + (esc(r.mobile) || '—') + '</td><td>' + esc(r.whatsapp) + '</td><td>' + (r.sector ? '<span class="pill">' + esc(r.sector) + '</span>' : '<span class="tm">—</span>') + '</td><td class="tm">' + (esc(r.unit) || '—') + '</td><td class="tm">' + esc(r.date) + '</td></tr>'; }).join('');
+    }
+    function dCh(id, obj) {
+      var el = document.getElementById(id);
+      var ents = Object.keys(obj).map(function (k) { return [k, obj[k]]; }).sort(function (a, b) { return b[1] - a[1]; });
+      if (!ents.length) { el.innerHTML = '<div class="ec">No data yet.</div>'; return; }
+      var mx = ents[0][1] || 1;
+      el.innerHTML = ents.map(function (it) { var pct = (it[1] / mx * 100).toFixed(1); return '<div class="br"><div class="bl">' + esc(it[0]) + '</div><div class="bt"><div class="bf" style="width:' + pct + '%"></div></div><div class="bc">' + it[1] + '</div></div>'; }).join('');
+    }
+    function expCSV() {
+      var regs = gR(); if (!regs.length) { alert('No registrations to export.'); return; }
+      var hdr = ['#', 'Name', 'Mobile', 'WhatsApp', 'Sector', 'Unit', 'Date'];
+      var rows = regs.map(function (r, i) { return [i + 1, r.name, r.mobile, r.whatsapp, r.sector, r.unit, r.date]; });
+      var csv = [hdr].concat(rows).map(function (row) { return row.map(function (v) { return '"' + String(v || '').replace(/"/g, '""') + '"'; }).join(','); }).join('\r\n');
+      var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+      var url = URL.createObjectURL(blob), a = document.createElement('a');
+      a.href = url; a.download = 'nattudars_' + new Date().toLocaleDateString('en-GB').replace(/\//g, '-') + '.csv';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    }
+    function clrAll() {
+      alert('To delete registrations, please open your Google Sheet spreadsheet and clear the rows there.');
+    }
+    document.getElementById('fs').addEventListener('change', function () {
+      var sec = this.value;
+      var uSel = document.getElementById('fu');
+      uSel.innerHTML = '';
+      if (sec && SU[sec]) {
+        var opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = 'Choose...';
+        uSel.appendChild(opt);
+        SU[sec].forEach(function (u) {
+          var opt = document.createElement('option');
+          opt.value = u;
+          opt.textContent = u;
+          uSel.appendChild(opt);
+        });
+        uSel.disabled = false;
+      } else {
+        var opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = 'Choose Sector first...';
+        uSel.appendChild(opt);
+        uSel.disabled = true;
+      }
+    });
+    document.getElementById('rfm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var name = document.getElementById('fn').value.trim();
+      var mob = document.getElementById('fm').value.trim();
+      var wa = document.getElementById('fw').value.trim();
+      var sec = document.getElementById('fs').value;
+      var un = document.getElementById('fu').value;
+      document.getElementById('fn').classList.remove('err'); document.getElementById('en').classList.remove('show');
+      document.getElementById('fw').classList.remove('err'); document.getElementById('ew').classList.remove('show');
+      document.getElementById('fm').classList.remove('err');
+      var ok = true;
+      if (!name) { document.getElementById('fn').classList.add('err'); document.getElementById('en').classList.add('show'); ok = false; }
+
+      var cleanMob = mob.replace(/\D/g, '');
+      var cleanWa = wa.replace(/\D/g, '');
+
+      if (mob && (cleanMob.length < 8 || cleanMob.length > 15)) {
+        document.getElementById('fm').classList.add('err');
+        alert('Mobile number must be between 8 and 15 digits.');
+        ok = false;
+      }
+
+      if (!wa) {
+        document.getElementById('fw').classList.add('err');
+        document.getElementById('ew').textContent = 'WhatsApp number is required.';
+        document.getElementById('ew').classList.add('show');
+        ok = false;
+      } else if (cleanWa.length < 8 || cleanWa.length > 15) {
+        document.getElementById('fw').classList.add('err');
+        document.getElementById('ew').textContent = 'WhatsApp number must contain between 8 and 15 digits.';
+        document.getElementById('ew').classList.add('show');
+        ok = false;
+      }
+      if (!ok) return;
+      var entry = { id: uid(), name: name, mobile: mob, whatsapp: wa, sector: sec, unit: un, date: new Date().toLocaleDateString('en-GB') };
+      var regs = gR(); regs.push(entry); sR(regs);
+      sBnr('ok', 'Registration successful! Welcome aboard.');
+      document.getElementById('rfm').reset();
+      var uSel = document.getElementById('fu');
+      uSel.innerHTML = '<option value="">Choose Sector first...</option>';
+      uSel.disabled = true;
+      if (SCRIPT_URL) {
+        fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(entry)
+        }).catch(function (err) { console.error(err); });
+      }
+      setTimeout(hBnr, 3000);
+    });
+    window.editReg = function (id) {
+      var regs = gR();
+      var r = regs.find(function (item) { return item.id === id; });
+      if (!r) return;
+      document.getElementById('e-id').value = r.id;
+      document.getElementById('e-name').value = r.name || '';
+      document.getElementById('e-mobile').value = r.mobile || '';
+      document.getElementById('e-whatsapp').value = r.whatsapp || '';
+      document.getElementById('edit-modal').classList.add('on');
+    };
+    window.closeEditModal = function () {
+      document.getElementById('edit-modal').classList.remove('on');
+    };
+    window.deleteReg = function (id) {
+      if (!confirm('Are you sure you want to delete this registration?')) return;
+      var regs = gR();
+      var index = regs.findIndex(function (item) { return item.id === id; });
+      if (index !== -1) {
+        regs.splice(index, 1);
+        sR(regs);
+        if (SCRIPT_URL) {
+          fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'delete',
+              id: id
+            })
+          }).catch(function (err) { console.error(err); });
+        }
+      }
+      var ss = gSs();
+      if (ss) rRole(ss);
+    };
+    document.getElementById('efm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var id = document.getElementById('e-id').value;
+      var name = document.getElementById('e-name').value.trim();
+      var mob = document.getElementById('e-mobile').value.trim();
+      var wa = document.getElementById('e-whatsapp').value.trim();
+
+      if (!name || !wa) {
+        alert('Name and WhatsApp are required.');
+        return;
+      }
+      var cleanMob = mob.replace(/\D/g, '');
+      var cleanWa = wa.replace(/\D/g, '');
+      if (mob && (cleanMob.length < 8 || cleanMob.length > 15)) {
+        alert('Mobile number must be between 8 and 15 digits.');
+        return;
+      }
+      if (cleanWa.length < 8 || cleanWa.length > 15) {
+        alert('WhatsApp number must be between 8 and 15 digits.');
+        return;
+      }
+      var regs = gR();
+      var index = regs.findIndex(function (item) { return item.id === id; });
+      if (index !== -1) {
+        regs[index].name = name;
+        regs[index].mobile = mob;
+        regs[index].whatsapp = wa;
+        sR(regs);
+        if (SCRIPT_URL) {
+          fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'update',
+              id: id,
+              name: name,
+              mobile: mob,
+              whatsapp: wa
+            })
+          }).catch(function (err) { console.error(err); });
+        }
+      }
+      closeEditModal();
+      var ss = gSs();
+      if (ss) rRole(ss);
+    });
+    function sBnr(t, m) { var b = document.getElementById('fbnr'); b.className = 'bnr ' + t; b.textContent = m; }
+    function hBnr() { var b = document.getElementById('fbnr'); b.className = 'bnr'; b.textContent = ''; } 
+  </script>
+</body>
+
+</html>
