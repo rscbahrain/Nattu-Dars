@@ -787,11 +787,12 @@
           <div class="fr">
             <div class="fg">
               <label for="fm">Mobile Number</label>
-              <input type="tel" id="fm" placeholder="e.g. +973XXXXXXXX (11-13 chars)" oninput="this.value = this.value.replace(/[^0-9+]/g, '')" maxlength="13" />
+              <input type="tel" id="fm" placeholder="" oninput="this.value = this.value.replace(/[^0-9+]/g, '')" maxlength="13" />
+              <div class="tm" style="font-size: 11px; margin-top: 4px;">(with country code)</div>
             </div>
             <div class="fg">
               <label for="fw">WhatsApp Number <span class="rq">*</span></label>
-              <input type="tel" id="fw" placeholder="e.g. +973XXXXXXXX" required
+              <input type="tel" id="fw" placeholder="" required
                 oninput="this.value = this.value.replace(/[^0-9+]/g, '')" maxlength="15" />
               <div class="ferr" id="ew">WhatsApp number is required.</div>
             </div>
@@ -1051,11 +1052,12 @@
         </div>
         <div class="fg">
           <label for="e-mobile">Mobile Number</label>
-          <input type="tel" id="e-mobile" placeholder="e.g. +973XXXXXXXX (11-13 chars)" oninput="this.value = this.value.replace(/[^0-9+]/g, '')" maxlength="13" />
+          <input type="tel" id="e-mobile" placeholder="" oninput="this.value = this.value.replace(/[^0-9+]/g, '')" maxlength="13" />
+          <div class="tm" style="font-size: 11px; margin-top: 4px;">(with country code)</div>
         </div>
         <div class="fg">
           <label for="e-whatsapp">WhatsApp Number <span class="rq">*</span></label>
-          <input type="tel" id="e-whatsapp" placeholder="e.g. +973XXXXXXXX" required oninput="this.value = this.value.replace(/[^0-9+]/g, '')" maxlength="15" />
+          <input type="tel" id="e-whatsapp" placeholder="" required oninput="this.value = this.value.replace(/[^0-9+]/g, '')" maxlength="15" />
         </div>
         <div class="fg">
           <label for="e-sector">Sector</label>
@@ -1398,9 +1400,9 @@
       var cleanMob = mob.replace(/\D/g, '');
       var cleanWa = wa.replace(/\D/g, '');
 
-      if (mob && (mob.length < 11 || mob.length > 13)) {
+      if (mob && (mob.length < 8 || mob.length > 13)) {
         document.getElementById('fm').classList.add('err');
-        alert('Mobile number must be 11, 12, or 13 characters long.');
+        alert('Mobile number must be between 8 and 13 characters long.');
         ok = false;
       }
 
@@ -1505,8 +1507,8 @@
       }
       var cleanMob = mob.replace(/\D/g, '');
       var cleanWa = wa.replace(/\D/g, '');
-      if (mob && (mob.length < 11 || mob.length > 13)) {
-        alert('Mobile number must be 11, 12, or 13 characters long.');
+      if (mob && (mob.length < 8 || mob.length > 13)) {
+        alert('Mobile number must be between 8 and 13 characters long.');
         return;
       }
       if (cleanWa.length < 8 || cleanWa.length > 15) {
