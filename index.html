@@ -1435,7 +1435,7 @@
     });
     window.editReg = function (id) {
       var regs = gR();
-      var r = regs.find(function (item) { return item.id === id; });
+      var r = regs.find(function (item) { return String(item.id) === String(id); });
       if (!r) return;
       document.getElementById('e-id').value = r.id;
       document.getElementById('e-name').value = r.name || '';
@@ -1471,7 +1471,7 @@
     window.deleteReg = function (id) {
       if (!confirm('Are you sure you want to delete this registration?')) return;
       var regs = gR();
-      var index = regs.findIndex(function (item) { return item.id === id; });
+      var index = regs.findIndex(function (item) { return String(item.id) === String(id); });
       if (index !== -1) {
         regs.splice(index, 1);
         sR(regs);
@@ -1514,7 +1514,7 @@
         return;
       }
       var regs = gR();
-      var index = regs.findIndex(function (item) { return item.id === id; });
+      var index = regs.findIndex(function (item) { return String(item.id) === String(id); });
       if (index !== -1) {
         regs[index].name = name;
         regs[index].mobile = mob;
