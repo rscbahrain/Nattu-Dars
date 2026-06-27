@@ -789,7 +789,7 @@
           <div class="fr">
             <div class="fg">
               <label for="fm">Mobile Number</label>
-              <input type="tel" id="fm" placeholder="13 characters (e.g. +973XXXXXXXX)" oninput="this.value = this.value.replace(/[^0-9+]/g, '')" maxlength="13" />
+              <input type="tel" id="fm" placeholder="e.g. +973XXXXXXXX (11-13 chars)" oninput="this.value = this.value.replace(/[^0-9+]/g, '')" maxlength="13" />
             </div>
             <div class="fg">
               <label for="fw">WhatsApp Number <span class="rq">*</span></label>
@@ -1030,7 +1030,7 @@
         </div>
         <div class="fg">
           <label for="e-mobile">Mobile Number</label>
-          <input type="tel" id="e-mobile" placeholder="13 characters (e.g. +973XXXXXXXX)" oninput="this.value = this.value.replace(/[^0-9+]/g, '')" maxlength="13" />
+          <input type="tel" id="e-mobile" placeholder="e.g. +973XXXXXXXX (11-13 chars)" oninput="this.value = this.value.replace(/[^0-9+]/g, '')" maxlength="13" />
         </div>
         <div class="fg">
           <label for="e-whatsapp">WhatsApp Number <span class="rq">*</span></label>
@@ -1267,9 +1267,9 @@
       var cleanMob = mob.replace(/\D/g, '');
       var cleanWa = wa.replace(/\D/g, '');
 
-      if (mob && mob.length !== 13) {
+      if (mob && (mob.length < 11 || mob.length > 13)) {
         document.getElementById('fm').classList.add('err');
-        alert('Mobile number must be exactly 13 characters.');
+        alert('Mobile number must be 11, 12, or 13 characters long.');
         ok = false;
       }
 
@@ -1350,8 +1350,8 @@
       }
       var cleanMob = mob.replace(/\D/g, '');
       var cleanWa = wa.replace(/\D/g, '');
-      if (mob && mob.length !== 13) {
-        alert('Mobile number must be exactly 13 characters.');
+      if (mob && (mob.length < 11 || mob.length > 13)) {
+        alert('Mobile number must be 11, 12, or 13 characters long.');
         return;
       }
       if (cleanWa.length < 8 || cleanWa.length > 15) {
