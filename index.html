@@ -789,8 +789,7 @@
           <div class="fr">
             <div class="fg">
               <label for="fm">Mobile Number</label>
-              <input type="tel" id="fm" placeholder="e.g. +973XXXXXXXX"
-                oninput="this.value = this.value.replace(/[^0-9+]/g, '')" maxlength="15" />
+              <input type="tel" id="fm" placeholder="13 characters (e.g. +973XXXXXXXX)" oninput="this.value = this.value.replace(/[^0-9+]/g, '')" maxlength="13" />
             </div>
             <div class="fg">
               <label for="fw">WhatsApp Number <span class="rq">*</span></label>
@@ -1031,8 +1030,7 @@
         </div>
         <div class="fg">
           <label for="e-mobile">Mobile Number</label>
-          <input type="tel" id="e-mobile" placeholder="e.g. +973XXXXXXXX"
-            oninput="this.value = this.value.replace(/[^0-9+]/g, '')" maxlength="15" />
+          <input type="tel" id="e-mobile" placeholder="13 characters (e.g. +973XXXXXXXX)" oninput="this.value = this.value.replace(/[^0-9+]/g, '')" maxlength="13" />
         </div>
         <div class="fg">
           <label for="e-whatsapp">WhatsApp Number <span class="rq">*</span></label>
@@ -1044,6 +1042,16 @@
           <button type="button" class="blo" style="flex:1;" onclick="closeEditModal()">Cancel</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- SUCCESS MODAL -->
+  <div id="success-modal" class="modal">
+    <div class="lcrd" style="max-width:400px; background:#fff; padding:28px; text-align:center;">
+      <div style="font-size:48px; color:var(--green); margin-bottom:14px;">✓</div>
+      <h2 style="font-family:'Noto Serif Malayalam', serif; font-size:20px; font-weight:700; color:var(--green); margin-bottom:8px;">Registration Successful!</h2>
+      <p style="font-size:14px; color:var(--t2); margin-bottom:20px;">Welcome aboard. Your registration has been submitted successfully.</p>
+      <button type="button" class="btnp" style="margin-top:0;" onclick="closeSuccessModal()">OK</button>
     </div>
   </div>
 
@@ -1259,9 +1267,9 @@
       var cleanMob = mob.replace(/\D/g, '');
       var cleanWa = wa.replace(/\D/g, '');
 
-      if (mob && (cleanMob.length < 8 || cleanMob.length > 15)) {
+      if (mob && mob.length !== 13) {
         document.getElementById('fm').classList.add('err');
-        alert('Mobile number must be between 8 and 15 digits.');
+        alert('Mobile number must be exactly 13 characters.');
         ok = false;
       }
 
@@ -1279,7 +1287,7 @@
       if (!ok) return;
       var entry = { id: uid(), name: name, mobile: mob, whatsapp: wa, sector: sec, unit: un, date: new Date().toLocaleDateString('en-GB') };
       var regs = gR(); regs.push(entry); sR(regs);
-      sBnr('ok', 'Registration successful! Welcome aboard.');
+      document.getElementById('success-modal').classList.add('on');
       document.getElementById('rfm').reset();
       var uSel = document.getElementById('fu');
       uSel.innerHTML = '<option value="">Choose Sector first...</option>';
@@ -1342,8 +1350,8 @@
       }
       var cleanMob = mob.replace(/\D/g, '');
       var cleanWa = wa.replace(/\D/g, '');
-      if (mob && (cleanMob.length < 8 || cleanMob.length > 15)) {
-        alert('Mobile number must be between 8 and 15 digits.');
+      if (mob && mob.length !== 13) {
+        alert('Mobile number must be exactly 13 characters.');
         return;
       }
       if (cleanWa.length < 8 || cleanWa.length > 15) {
@@ -1376,6 +1384,9 @@
       var ss = gSs();
       if (ss) rRole(ss);
     });
+    window.closeSuccessModal = function() {
+      document.getElementById('success-modal').classList.remove('on');
+    };
     function sBnr(t, m) { var b = document.getElementById('fbnr'); b.className = 'bnr ' + t; b.textContent = m; }
     function hBnr() { var b = document.getElementById('fbnr'); b.className = 'bnr'; b.textContent = ''; } 
   </script>
