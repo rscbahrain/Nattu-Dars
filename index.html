@@ -774,10 +774,8 @@
     <div class="wrap">
       <div class="crd">
         <div class="rhd">
-          <div class="rtl malayalam">നാട്ടു ദർസ്</div>
-          <div class="rsb">&#1575;&#1604;&#1589;&#1601;&#1577; &#8212; RSC Bahrain</div>
-          <div class="rdsc malayalam" style="font-size: 14px; margin-top: 8px;">സുൽത്താനുൽ ഉലമയുടെ കിതാബ് ഓതി
-            പഠിക്കുന്നു.</div>
+          <img src="Natudars.png" alt="നാട്ടു ദർസ്" style="max-width: 260px; width: 100%; height: auto; margin: 0 auto 12px; display: block;" />
+          <div class="rdsc malayalam" style="font-size: 14px; margin-top: 8px;">സുൽത്താനുൽ ഉലമയുടെ കിതാബ് ഓതി പഠിക്കുന്നു.</div>
         </div>
         <div class="bnr" id="fbnr" role="alert" aria-live="polite"></div>
         <form id="rfm" novalidate>
@@ -825,6 +823,7 @@
           </div>
           <button type="submit" class="btnp">Register Now</button>
         </form>
+        <div style="text-align: center; margin-top: 24px; font-weight: 600; color: var(--mu); letter-spacing: 0.8px; font-size: 11px;">RSC BAHRAIN</div>
       </div>
     </div>
   </main>
@@ -881,6 +880,9 @@
         <div class="tcrd">
           <div class="ttb">
             <div class="tttl" id="uttl">Registrations</div>
+            <div class="tact">
+              <button class="bsm bex" onclick="expUnitCSV()">Download CSV</button>
+            </div>
           </div>
           <div class="tw">
             <table aria-label="Unit registrations">
@@ -931,9 +933,12 @@
         <div class="tcrd">
           <div class="ttb">
             <div class="tttl">Registration List</div>
-            <div class="tact"><select id="sfl" class="fsel" onchange="rSecTbl()">
+            <div class="tact">
+              <select id="sfl" class="fsel" style="margin-right: 8px;" onchange="rSecTbl()">
                 <option value="">All Units</option>
-              </select></div>
+              </select>
+              <button class="bsm bex" onclick="expSecCSV()">Download CSV</button>
+            </div>
           </div>
           <div class="tw">
             <table aria-label="Sector registrations">
@@ -986,13 +991,28 @@
         </div>
         <div class="stl">All Registrations</div>
         <div class="tcrd">
-          <div class="ttb">
+          <div class="ttb" style="flex-wrap: wrap; gap: 8px;">
             <div class="tttl">Registration List</div>
-            <div class="tact">
-              <a id="shl" href="#" target="_blank" class="bsm bex"
-                style="text-decoration:none;display:none;align-items:center;justify-content:center;margin-right:8px;">Open
-                Google Sheet</a>
-              <button class="bsm bex" onclick="expCSV()">Download CSV</button>
+            <div class="tact" style="flex-wrap: wrap; gap: 8px;">
+              <select id="ad-filter-sector" class="fsel" onchange="onAdminSectorChange()">
+                <option value="">All Sectors</option>
+                <option>GUDAIBIYA</option>
+                <option>CASENO</option>
+                <option>HIDD</option>
+                <option>JUFFAIR</option>
+                <option>SALMABAD</option>
+                <option>SALMANIYA</option>
+                <option>BUDAYYA</option>
+                <option>KHALEEFA</option>
+                <option>SANAD</option>
+                <option>HAMAD TOWN</option>
+                <option>ISA TOWN</option>
+              </select>
+              <select id="ad-filter-unit" class="fsel" onchange="rAdmTbl()">
+                <option value="">All Units</option>
+              </select>
+              <button class="bsm bex" onclick="expAdmFilteredCSV()">Download Filtered</button>
+              <button class="bsm bex" style="background:#533AB7; color:#fff; border-color:#533AB7;" onclick="expAdmAllCSV()">Download All</button>
               <button class="bsm bdn" onclick="clrAll()">Clear All</button>
             </div>
           </div>
@@ -1007,6 +1027,7 @@
                   <th>Sector</th>
                   <th>Unit</th>
                   <th>Date</th>
+                  <th style="text-align:right">Actions</th>
                 </tr>
               </thead>
               <tbody id="atb"></tbody>
@@ -1020,7 +1041,7 @@
 
   <!-- EDIT MODAL -->
   <div id="edit-modal" class="modal">
-    <div class="lcrd" style="max-width:450px; background:#fff; padding:28px;">
+    <div class="lcrd" style="max-width:450px; background:#fff; padding:28px; max-height:90vh; overflow-y:auto;">
       <h2 style="font-size:18px; font-weight:700; margin-bottom:18px; text-align:center;">Edit Registration</h2>
       <form id="efm" novalidate>
         <input type="hidden" id="e-id" />
@@ -1034,8 +1055,30 @@
         </div>
         <div class="fg">
           <label for="e-whatsapp">WhatsApp Number <span class="rq">*</span></label>
-          <input type="tel" id="e-whatsapp" placeholder="e.g. +973XXXXXXXX" required
-            oninput="this.value = this.value.replace(/[^0-9+]/g, '')" maxlength="15" />
+          <input type="tel" id="e-whatsapp" placeholder="e.g. +973XXXXXXXX" required oninput="this.value = this.value.replace(/[^0-9+]/g, '')" maxlength="15" />
+        </div>
+        <div class="fg">
+          <label for="e-sector">Sector</label>
+          <select id="e-sector">
+            <option value="">Choose...</option>
+            <option>GUDAIBIYA</option>
+            <option>CASENO</option>
+            <option>HIDD</option>
+            <option>JUFFAIR</option>
+            <option>SALMABAD</option>
+            <option>SALMANIYA</option>
+            <option>BUDAYYA</option>
+            <option>KHALEEFA</option>
+            <option>SANAD</option>
+            <option>HAMAD TOWN</option>
+            <option>ISA TOWN</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label for="e-unit">Unit</label>
+          <select id="e-unit">
+            <option value="">Choose Sector first...</option>
+          </select>
         </div>
         <div style="display:flex; gap:10px; margin-top:20px;">
           <button type="submit" class="btnp" style="flex:1; margin-top:0;">Save</button>
@@ -1193,8 +1236,6 @@
     }
 
     function rAdm() {
-      var lk = document.getElementById('shl');
-      if (typeof SPREADSHEET_URL !== 'undefined' && SPREADSHEET_URL) { lk.href = SPREADSHEET_URL; lk.style.display = 'inline-flex'; } else { lk.style.display = 'none'; }
       var regs = gR(), sS = {}, uS = {};
       regs.forEach(function (r) { if (r.sector) sS[r.sector] = 1; if (r.unit) uS[r.unit] = 1; });
       document.getElementById('as1').textContent = regs.length;
@@ -1202,11 +1243,34 @@
       document.getElementById('as3').textContent = Object.keys(uS).length;
       var sc = {}; regs.forEach(function (r) { if (r.sector) sc[r.sector] = (sc[r.sector] || 0) + 1; }); dCh('ach1', sc);
       var uc = {}; regs.forEach(function (r) { if (r.unit) uc[r.unit] = (uc[r.unit] || 0) + 1; }); dCh('ach2', uc);
-      var tb = document.getElementById('atb');
-      if (!regs.length) { tb.innerHTML = '<tr><td colspan="7" class="et">No registrations yet.</td></tr>'; return; }
-      var dp = regs.slice().reverse();
-      tb.innerHTML = dp.map(function (r, i) { return '<tr><td class="ic tm">' + (i + 1) + '</td><td>' + esc(r.name) + '</td><td class="tm">' + (esc(r.mobile) || '—') + '</td><td>' + esc(r.whatsapp) + '</td><td>' + (r.sector ? '<span class="pill">' + esc(r.sector) + '</span>' : '<span class="tm">—</span>') + '</td><td class="tm">' + (esc(r.unit) || '—') + '</td><td class="tm">' + esc(r.date) + '</td></tr>'; }).join('');
+      rAdmTbl();
     }
+    function rAdmTbl() {
+      var sec = document.getElementById('ad-filter-sector').value;
+      var un = document.getElementById('ad-filter-unit').value;
+      var regs = gR();
+      if (sec) regs = regs.filter(function(r) { return nm(r.sector) === nm(sec); });
+      if (un) regs = regs.filter(function(r) { return nm(r.unit) === nm(un); });
+      
+      var tb = document.getElementById('atb');
+      if (!regs.length) { tb.innerHTML = '<tr><td colspan="8" class="et">No registrations found.</td></tr>'; return; }
+      var dp = regs.slice().reverse();
+      tb.innerHTML = dp.map(function (r, i) { return '<tr><td class="ic tm">' + (i + 1) + '</td><td>' + esc(r.name) + '</td><td class="tm">' + (esc(r.mobile) || '—') + '</td><td>' + esc(r.whatsapp) + '</td><td>' + (r.sector ? '<span class="pill">' + esc(r.sector) + '</span>' : '<span class="tm">—</span>') + '</td><td class="tm">' + (esc(r.unit) || '—') + '</td><td class="tm">' + esc(r.date) + '</td><td style="text-align:right;white-space:nowrap;"><button class="bsm bex" style="margin-right:4px;" onclick="editReg(\'' + r.id + '\')">Edit</button><button class="bsm bdn" onclick="deleteReg(\'' + r.id + '\')">Delete</button></td></tr>'; }).join('');
+    }
+    window.onAdminSectorChange = function() {
+      var sec = document.getElementById('ad-filter-sector').value;
+      var uSel = document.getElementById('ad-filter-unit');
+      uSel.innerHTML = '<option value="">All Units</option>';
+      if (sec && SU[sec]) {
+        SU[sec].forEach(function(u) {
+          var opt = document.createElement('option');
+          opt.value = u;
+          opt.textContent = u;
+          uSel.appendChild(opt);
+        });
+      }
+      rAdmTbl();
+    };
     function dCh(id, obj) {
       var el = document.getElementById(id);
       var ents = Object.keys(obj).map(function (k) { return [k, obj[k]]; }).sort(function (a, b) { return b[1] - a[1]; });
@@ -1214,15 +1278,60 @@
       var mx = ents[0][1] || 1;
       el.innerHTML = ents.map(function (it) { var pct = (it[1] / mx * 100).toFixed(1); return '<div class="br"><div class="bl">' + esc(it[0]) + '</div><div class="bt"><div class="bf" style="width:' + pct + '%"></div></div><div class="bc">' + it[1] + '</div></div>'; }).join('');
     }
-    function expCSV() {
-      var regs = gR(); if (!regs.length) { alert('No registrations to export.'); return; }
-      var hdr = ['#', 'Name', 'Mobile', 'WhatsApp', 'Sector', 'Unit', 'Date'];
-      var rows = regs.map(function (r, i) { return [i + 1, r.name, r.mobile, r.whatsapp, r.sector, r.unit, r.date]; });
-      var csv = [hdr].concat(rows).map(function (row) { return row.map(function (v) { return '"' + String(v || '').replace(/"/g, '""') + '"'; }).join(','); }).join('\r\n');
+    function downloadCSV(filename, headers, dataRows) {
+      var csv = [headers].concat(dataRows).map(function(row) {
+        return row.map(function(v) {
+          return '"' + String(v || '').replace(/"/g, '""') + '"';
+        }).join(',');
+      }).join('\r\n');
       var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-      var url = URL.createObjectURL(blob), a = document.createElement('a');
-      a.href = url; a.download = 'nattudars_' + new Date().toLocaleDateString('en-GB').replace(/\//g, '-') + '.csv';
-      document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+    window.expUnitCSV = function() {
+      var ss = gSs();
+      if (!ss || !ss.unit) return;
+      var regs = gR().filter(function(r) { return nm(r.unit) === nm(ss.unit); });
+      if (!regs.length) { alert('No registrations to export.'); return; }
+      var hdrs = ['#', 'Name', 'Mobile', 'WhatsApp', 'Date'];
+      var rows = regs.map(function(r, i) { return [i + 1, r.name, r.mobile, r.whatsapp, r.date]; });
+      downloadCSV('registrations_' + ss.unit.toLowerCase().replace(/ /g, '_') + '.csv', hdrs, rows);
+    };
+    window.expSecCSV = function() {
+      var ss = gSs();
+      if (!ss || !ss.sector) return;
+      var fu = document.getElementById('sfl').value;
+      var regs = gR().filter(function(r) { return nm(r.sector) === nm(ss.sector); });
+      if (fu) regs = regs.filter(function(r) { return nm(r.unit) === nm(fu); });
+      if (!regs.length) { alert('No registrations to export.'); return; }
+      var hdrs = ['#', 'Name', 'Mobile', 'WhatsApp', 'Unit', 'Date'];
+      var rows = regs.map(function(r, i) { return [i + 1, r.name, r.mobile, r.whatsapp, r.unit, r.date]; });
+      var fn = 'registrations_' + ss.sector.toLowerCase().replace(/ /g, '_') + (fu ? '_' + fu.toLowerCase().replace(/ /g, '_') : '') + '.csv';
+      downloadCSV(fn, hdrs, rows);
+    };
+    window.expAdmFilteredCSV = function() {
+      var sec = document.getElementById('ad-filter-sector').value;
+      var un = document.getElementById('ad-filter-unit').value;
+      var regs = gR();
+      if (sec) regs = regs.filter(function(r) { return nm(r.sector) === nm(sec); });
+      if (un) regs = regs.filter(function(r) { return nm(r.unit) === nm(un); });
+      if (!regs.length) { alert('No registrations to export.'); return; }
+      var hdrs = ['#', 'Name', 'Mobile', 'WhatsApp', 'Sector', 'Unit', 'Date'];
+      var rows = regs.map(function(r, i) { return [i + 1, r.name, r.mobile, r.whatsapp, r.sector, r.unit, r.date]; });
+      downloadCSV('registrations_filtered.csv', hdrs, rows);
+    };
+    window.expAdmAllCSV = function() {
+      var regs = gR();
+      if (!regs.length) { alert('No registrations to export.'); return; }
+      var hdrs = ['#', 'Name', 'Mobile', 'WhatsApp', 'Sector', 'Unit', 'Date'];
+      var rows = regs.map(function(r, i) { return [i + 1, r.name, r.mobile, r.whatsapp, r.sector, r.unit, r.date]; });
+      downloadCSV('registrations_all.csv', hdrs, rows);
     }
     function clrAll() {
       alert('To delete registrations, please open your Google Sheet spreadsheet and clear the rows there.');
@@ -1249,6 +1358,28 @@
         opt.textContent = 'Choose Sector first...';
         uSel.appendChild(opt);
         uSel.disabled = true;
+      }
+    });
+    document.getElementById('e-sector').addEventListener('change', function () {
+      var sec = this.value;
+      var uSel = document.getElementById('e-unit');
+      uSel.innerHTML = '';
+      if (sec && SU[sec]) {
+        var opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = 'Choose...';
+        uSel.appendChild(opt);
+        SU[sec].forEach(function (u) {
+          var opt = document.createElement('option');
+          opt.value = u;
+          opt.textContent = u;
+          uSel.appendChild(opt);
+        });
+      } else {
+        var opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = 'Choose Sector first...';
+        uSel.appendChild(opt);
       }
     });
     document.getElementById('rfm').addEventListener('submit', function (e) {
@@ -1310,6 +1441,28 @@
       document.getElementById('e-name').value = r.name || '';
       document.getElementById('e-mobile').value = r.mobile || '';
       document.getElementById('e-whatsapp').value = r.whatsapp || '';
+      var sec = r.sector || '';
+      document.getElementById('e-sector').value = sec;
+      var uSel = document.getElementById('e-unit');
+      uSel.innerHTML = '';
+      if (sec && SU[sec]) {
+        var opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = 'Choose...';
+        uSel.appendChild(opt);
+        SU[sec].forEach(function (u) {
+          var opt = document.createElement('option');
+          opt.value = u;
+          opt.textContent = u;
+          uSel.appendChild(opt);
+        });
+        uSel.value = r.unit || '';
+      } else {
+        var opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = 'Choose Sector first...';
+        uSel.appendChild(opt);
+      }
       document.getElementById('edit-modal').classList.add('on');
     };
     window.closeEditModal = function () {
@@ -1343,6 +1496,8 @@
       var name = document.getElementById('e-name').value.trim();
       var mob = document.getElementById('e-mobile').value.trim();
       var wa = document.getElementById('e-whatsapp').value.trim();
+      var sec = document.getElementById('e-sector').value;
+      var un = document.getElementById('e-unit').value;
 
       if (!name || !wa) {
         alert('Name and WhatsApp are required.');
@@ -1364,6 +1519,8 @@
         regs[index].name = name;
         regs[index].mobile = mob;
         regs[index].whatsapp = wa;
+        regs[index].sector = sec;
+        regs[index].unit = un;
         sR(regs);
         if (SCRIPT_URL) {
           fetch(SCRIPT_URL, {
@@ -1375,7 +1532,9 @@
               id: id,
               name: name,
               mobile: mob,
-              whatsapp: wa
+              whatsapp: wa,
+              sector: sec,
+              unit: un
             })
           }).catch(function (err) { console.error(err); });
         }
