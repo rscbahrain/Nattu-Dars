@@ -1117,19 +1117,6 @@
       'JUFFAIR': ['ADLIYA', 'JAZEERA', 'UM AL HASAM'],
       'CASENO': ['BUSAITHEEN', 'HALA', 'MUHARRAQ SOUQ', 'AIRPORT']
     };
-    var CR = {};
-    CR['ADMIN'] = { pw: 'admin', role: 'admin' };
-    CR['RSCBAHRAIN'] = { pw: 'rscbahrain', role: 'admin' };
-    var _sk = Object.keys(SU);
-    for (var _i = 0; _i < _sk.length; _i++) {
-      var _s = _sk[_i];
-      CR['SC' + _s] = { pw: _s.toLowerCase(), role: 'sector', sector: _s };
-      var _us = SU[_s];
-      for (var _j = 0; _j < _us.length; _j++) {
-        var _u = _us[_j];
-        CR['UN' + _u] = { pw: _u.toLowerCase(), role: 'unit', unit: _u, sector: _s };
-      }
-    }
     function gR() { try { return JSON.parse(localStorage.getItem(LS)) || []; } catch (e) { return []; } }
     function sR(a) { localStorage.setItem(LS, JSON.stringify(a)); }
     function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
@@ -1140,10 +1127,21 @@
     function cSs() { sessionStorage.removeItem(SS); }
     function syncData(cb) {
       if (!SCRIPT_URL) { if (cb) cb(); return; }
-      var url = SCRIPT_URL + (SCRIPT_URL.indexOf('?') === -1 ? '?' : '&') + '_t=' + Date.now();
+      var ss = gSs();
+      var u = ss ? ss.u : '';
+      var p = ss ? ss.p : '';
+      if (!u || !p) { if (cb) cb(); return; }
+      var url = SCRIPT_URL + (SCRIPT_URL.indexOf('?') === -1 ? '?' : '&') + 'u=' + encodeURIComponent(u) + '&p=' + encodeURIComponent(p) + '&_t=' + Date.now();
       fetch(url)
         .then(function (r) { return r.json(); })
-        .then(function (d) { if (Array.isArray(d)) sR(d); if (cb) cb(); })
+        .then(function (d) { 
+          if (Array.isArray(d)) {
+            sR(d); 
+          } else if (d && d.status === 'error') {
+            console.error("Auth error during sync:", d.message);
+          }
+          if (cb) cb(); 
+        })
         .catch(function (e) { console.error(e); if (cb) cb(); });
     }
 
@@ -1171,18 +1169,74 @@
       var u = document.getElementById('lu').value.trim().toUpperCase();
       var p = document.getElementById('lp').value;
       var err = document.getElementById('lerr');
-      var c = CR[u];
-      if (!c || c.pw !== p) { err.textContent = 'Invalid username or password. Please try again.'; err.hidden = false; return; }
-      err.hidden = true;
-      var ss = { role: c.role };
-      if (c.sector) ss.sector = c.sector;
-      if (c.unit) ss.unit = c.unit;
-      sSs(ss);
-      document.getElementById('lfm').reset();
-      syncData(function () {
-        sView(c.role);
-        rRole(ss);
-      });
+      
+      if (!u || !p) {
+        err.textContent = 'Please enter both username and password.';
+        err.hidden = false;
+        return;
+      }
+      
+      var role = null, sector = null, unit = null;
+      if (u === 'ADMIN' || u === 'RSCBAHRAIN') {
+        role = 'admin';
+      } else if (u.indexOf('SC') === 0) {
+        var secName = u.substring(2);
+        if (SU[secName]) {
+          role = 'sector';
+          sector = secName;
+        }
+      } else if (u.indexOf('UN') === 0) {
+        var unName = u.substring(2);
+        var keys = Object.keys(SU);
+        for (var i = 0; i < keys.length; i++) {
+          if (SU[keys[i]].indexOf(unName) !== -1) {
+            role = 'unit';
+            unit = unName;
+            sector = keys[i];
+            break;
+          }
+        }
+      }
+      
+      if (!role) {
+        err.textContent = 'Invalid username format.';
+        err.hidden = false;
+        return;
+      }
+      
+      var url = SCRIPT_URL + (SCRIPT_URL.indexOf('?') === -1 ? '?' : '&') + 'u=' + encodeURIComponent(u) + '&p=' + encodeURIComponent(p) + '&_t=' + Date.now();
+      
+      err.textContent = 'Verifying...';
+      err.hidden = false;
+      
+      fetch(url)
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (d && d.status === 'error') {
+            err.textContent = 'Invalid username or password. Please try again.';
+            err.hidden = false;
+            return;
+          }
+          if (Array.isArray(d)) {
+            err.hidden = true;
+            sR(d);
+            var ss = { role: role, u: u, p: p };
+            if (sector) ss.sector = sector;
+            if (unit) ss.unit = unit;
+            sSs(ss);
+            document.getElementById('lfm').reset();
+            sView(role);
+            rRole(ss);
+          } else {
+            err.textContent = 'Server response error. Please try again.';
+            err.hidden = false;
+          }
+        })
+        .catch(function (e) {
+          console.error(e);
+          err.textContent = 'Connection error. Please verify web app deployment.';
+          err.hidden = false;
+        });
     });
     function doOut() { cSs(); sView('l'); document.getElementById('lu').value = ''; document.getElementById('lp').value = ''; document.getElementById('lerr').hidden = true; }
     function rRole(ss) { if (ss.role === 'unit') rUnit(ss); else if (ss.role === 'sector') rSec(ss); else if (ss.role === 'admin') rAdm(); }
@@ -1479,13 +1533,16 @@
         regs.splice(index, 1);
         sR(regs);
         if (SCRIPT_URL) {
+          var ss = gSs();
           fetch(SCRIPT_URL, {
             method: 'POST',
             mode: 'no-cors',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               action: 'delete',
-              id: id
+              id: id,
+              u: ss ? ss.u : '',
+              p: ss ? ss.p : ''
             })
           }).catch(function (err) { console.error(err); });
         }
@@ -1526,6 +1583,7 @@
         regs[index].unit = un;
         sR(regs);
         if (SCRIPT_URL) {
+          var ss = gSs();
           fetch(SCRIPT_URL, {
             method: 'POST',
             mode: 'no-cors',
@@ -1537,7 +1595,9 @@
               mobile: mob,
               whatsapp: wa,
               sector: sec,
-              unit: un
+              unit: un,
+              u: ss ? ss.u : '',
+              p: ss ? ss.p : ''
             })
           }).catch(function (err) { console.error(err); });
         }
