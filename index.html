@@ -1101,7 +1101,7 @@
   </div>
 
   <script>
-    var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyxfC1PW1r6LTNaaR8fIVrKHNa8TiSTLD_OgZi56zmmchPDDmR41EAdaF_7l0rM7KfT/exec';
+    var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx3Co2v35os5UZzelPIG-Hno6knbGrdaSlhkaX11s2tK-Np3gwk840zSqLNtKzsGrU-/exec';
     var SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/1iPG9HTLKlMls9L2_Ve0SGQj5mP52t827FRzm0QZsllk/edit?gid=0#gid=0';
     var LS = 'nattudars_regs', SS = 'nattudars_session';
     var SU = {
@@ -1140,7 +1140,8 @@
     function cSs() { sessionStorage.removeItem(SS); }
     function syncData(cb) {
       if (!SCRIPT_URL) { if (cb) cb(); return; }
-      fetch(SCRIPT_URL)
+      var url = SCRIPT_URL + (SCRIPT_URL.indexOf('?') === -1 ? '?' : '&') + '_t=' + Date.now();
+      fetch(url)
         .then(function (r) { return r.json(); })
         .then(function (d) { if (Array.isArray(d)) sR(d); if (cb) cb(); })
         .catch(function (e) { console.error(e); if (cb) cb(); });
