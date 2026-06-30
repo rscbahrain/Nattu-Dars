@@ -418,6 +418,24 @@
       background: #ececec;
     }
 
+    .btn-sync-color {
+      color: var(--green) !important;
+      border-color: #86efac !important;
+    }
+
+    .btn-sync-color:hover {
+      background: var(--gbg) !important;
+    }
+
+    .btn-logout-color {
+      color: var(--red) !important;
+      border-color: #fca5a5 !important;
+    }
+
+    .btn-logout-color:hover {
+      background: var(--rbg) !important;
+    }
+
     .stl {
       font-size: 12px;
       font-weight: 700;
@@ -862,7 +880,10 @@
       <div class="wrap">
         <div class="rbar">
           <div class="rinfo"><span class="bdg bu">Unit Committee</span><span class="rname" id="urn"></span></div>
-          <button class="blo" onclick="doOut()">Logout</button>
+          <div style="display: flex; gap: 8px;">
+            <button class="blo btn-sync-color" id="btn-sync-u" onclick="triggerSync()">Refresh</button>
+            <button class="blo btn-logout-color" onclick="doOut()">Logout</button>
+          </div>
         </div>
         <div class="stl">My Unit Overview</div>
         <div class="sg" style="grid-template-columns: repeat(2, 1fr);">
@@ -911,7 +932,10 @@
       <div class="wrap">
         <div class="rbar">
           <div class="rinfo"><span class="bdg bs">Sector Committee</span><span class="rname" id="srn"></span></div>
-          <button class="blo" onclick="doOut()">Logout</button>
+          <div style="display: flex; gap: 8px;">
+            <button class="blo btn-sync-color" id="btn-sync-s" onclick="triggerSync()">Refresh</button>
+            <button class="blo btn-logout-color" onclick="doOut()">Logout</button>
+          </div>
         </div>
         <div class="stl">Sector Overview</div>
         <div class="sg">
@@ -967,7 +991,10 @@
       <div class="wrap">
         <div class="rbar">
           <div class="rinfo"><span class="bdg ba">RSC Bahrain</span><span class="rname">Full Access</span></div>
-          <button class="blo" onclick="doOut()">Logout</button>
+          <div style="display: flex; gap: 8px;">
+            <button class="blo btn-sync-color" id="btn-sync-a" onclick="triggerSync()">Refresh</button>
+            <button class="blo btn-logout-color" onclick="doOut()">Logout</button>
+          </div>
         </div>
         <div class="stl">Overview</div>
         <div class="sg">
@@ -1241,6 +1268,22 @@
         });
     });
     function doOut() { cSs(); localStorage.removeItem(LS); sView('l'); document.getElementById('lu').value = ''; document.getElementById('lp').value = ''; document.getElementById('lerr').hidden = true; }
+    window.triggerSync = function () {
+      var ss = gSs();
+      if (!ss) return;
+      var btnU = document.getElementById('btn-sync-u');
+      var btnS = document.getElementById('btn-sync-s');
+      var btnA = document.getElementById('btn-sync-a');
+      if (btnU) { btnU.disabled = true; btnU.textContent = 'Syncing...'; }
+      if (btnS) { btnS.disabled = true; btnS.textContent = 'Syncing...'; }
+      if (btnA) { btnA.disabled = true; btnA.textContent = 'Syncing...'; }
+      syncData(function () {
+        rRole(ss);
+        if (btnU) { btnU.disabled = false; btnU.textContent = 'Refresh'; }
+        if (btnS) { btnS.disabled = false; btnS.textContent = 'Refresh'; }
+        if (btnA) { btnA.disabled = false; btnA.textContent = 'Refresh'; }
+      });
+    };
     function rRole(ss) { if (ss.role === 'unit') rUnit(ss); else if (ss.role === 'sector') rSec(ss); else if (ss.role === 'admin') rAdm(); }
 
     function rUnit(ss) {
