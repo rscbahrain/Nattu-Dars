@@ -1238,7 +1238,7 @@
           err.hidden = false;
         });
     });
-    function doOut() { cSs(); sView('l'); document.getElementById('lu').value = ''; document.getElementById('lp').value = ''; document.getElementById('lerr').hidden = true; }
+    function doOut() { cSs(); localStorage.removeItem(LS); sView('l'); document.getElementById('lu').value = ''; document.getElementById('lp').value = ''; document.getElementById('lerr').hidden = true; }
     function rRole(ss) { if (ss.role === 'unit') rUnit(ss); else if (ss.role === 'sector') rSec(ss); else if (ss.role === 'admin') rAdm(); }
 
     function rUnit(ss) {
