@@ -799,7 +799,7 @@
           </div>
           <div class="fr">
             <div class="fg">
-              <label for="fs">Sector</label>
+              <label for="fs">Sector <span class="rq">*</span></label>
               <select id="fs">
                 <option value="">Choose...</option>
                 <option>GUDAIBIYA</option>
@@ -814,12 +814,14 @@
                 <option>HAMAD TOWN</option>
                 <option>ISA TOWN</option>
               </select>
+              <div class="ferr" id="es">Sector is required.</div>
             </div>
             <div class="fg">
-              <label for="fu">Unit</label>
+              <label for="fu">Unit <span class="rq">*</span></label>
               <select id="fu" disabled>
                 <option value="">Choose Sector first...</option>
               </select>
+              <div class="ferr" id="eu">Unit is required.</div>
             </div>
           </div>
           <button type="submit" class="btnp">Register Now</button>
@@ -1449,8 +1451,12 @@
       document.getElementById('fn').classList.remove('err'); document.getElementById('en').classList.remove('show');
       document.getElementById('fw').classList.remove('err'); document.getElementById('ew').classList.remove('show');
       document.getElementById('fm').classList.remove('err');
+      document.getElementById('fs').classList.remove('err'); document.getElementById('es').classList.remove('show');
+      document.getElementById('fu').classList.remove('err'); document.getElementById('eu').classList.remove('show');
       var ok = true;
       if (!name) { document.getElementById('fn').classList.add('err'); document.getElementById('en').classList.add('show'); ok = false; }
+      if (!sec) { document.getElementById('fs').classList.add('err'); document.getElementById('es').classList.add('show'); ok = false; }
+      if (!un) { document.getElementById('fu').classList.add('err'); document.getElementById('eu').classList.add('show'); ok = false; }
 
       var cleanMob = mob.replace(/\D/g, '');
       var cleanWa = wa.replace(/\D/g, '');
