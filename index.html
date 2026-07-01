@@ -1721,8 +1721,8 @@
       if (!u || !p) { if (cb) cb(); return; }
       
       var baseParam = (SCRIPT_URL.indexOf('?') === -1 ? '?' : '&') + 'u=' + encodeURIComponent(u) + '&p=' + encodeURIComponent(p) + '&_t=' + Date.now();
-      var urlRegs = SCRIPT_URL + baseParam;
-      var urlSessions = SCRIPT_URL + baseParam + '&type=sessions';
+      var urlRegs = SCRIPT_URL + baseParam + '&action=regs';
+      var urlSessions = SCRIPT_URL + baseParam + '&action=sessions';
       
       Promise.all([
         fetch(urlRegs).then(function (r) { return r.json(); }),
@@ -1851,6 +1851,7 @@
             document.getElementById('lfm').reset();
             sView('home');
             rHome(ss);
+            syncData();
           } else {
             err.textContent = 'Server response error. Please try again.';
             err.hidden = false;
@@ -2564,19 +2565,14 @@
       }
       
       if (SCRIPT_URL && u && p) {
-        fetch(SCRIPT_URL, {
-          method: 'POST',
-          body: JSON.stringify({
-            action: 'delete_session',
-            u: u,
-            p: p,
-            id: id
-          })
-        }).then(function(r) { return r.json(); })
-          .then(function(res) {
-            console.log("Deleted session from Sheet:", res);
-            syncData(function() { if (ss) rAttendance(ss); });
-          }).catch(console.error);
+        var dParams = SCRIPT_URL + (SCRIPT_URL.indexOf('?') === -1 ? '?' : '&') +
+          'action=delete_session&u=' + encodeURIComponent(u) +
+          '&p=' + encodeURIComponent(p) +
+          '&id=' + encodeURIComponent(id) +
+          '&_t=' + Date.now();
+        fetch(dParams)
+          .then(function() { syncData(function() { if (ss) rAttendance(ss); }); })
+          .catch(console.error);
       }
     }
     window.deleteSession = deleteSession;
@@ -2773,15 +2769,25 @@
       closeCreateSessionModal();
       if (ss) rAttendance(ss);
       
-      if (SCRIPT_URL) {
-        fetch(SCRIPT_URL, {
-          method: 'POST',
-          body: JSON.stringify(sessionData)
-        }).then(function(r) { return r.json(); })
-          .then(function(res) {
-            console.log("Saved session to Google Sheet:", res);
-            syncData(function() { if (ss) rAttendance(ss); });
-          }).catch(console.error);
+      if (SCRIPT_URL && ss) {
+        var sParams = SCRIPT_URL + (SCRIPT_URL.indexOf('?') === -1 ? '?' : '&') +
+          'action=' + encodeURIComponent(sessionData.action) +
+          '&u=' + encodeURIComponent(ss.u) +
+          '&p=' + encodeURIComponent(ss.p) +
+          '&id=' + encodeURIComponent(sessionData.id) +
+          '&topic=' + encodeURIComponent(sessionData.topic) +
+          '&date=' + encodeURIComponent(sessionData.date) +
+          '&unit=' + encodeURIComponent(sessionData.unit) +
+          '&sector=' + encodeURIComponent(sessionData.sector) +
+          '&venue=' + encodeURIComponent(sessionData.venue) +
+          '&ustadh=' + encodeURIComponent(sessionData.ustadh) +
+          '&startTime=' + encodeURIComponent(sessionData.startTime) +
+          '&classNumber=' + encodeURIComponent(sessionData.classNumber) +
+          '&notes=' + encodeURIComponent(sessionData.notes || '') +
+          '&_t=' + Date.now();
+        fetch(sParams)
+          .then(function() { syncData(function() { if (ss) rAttendance(ss); }); })
+          .catch(console.error);
       }
     });
 
@@ -2896,25 +2902,19 @@
       var ss = gSs();
       if (ss) rAttendance(ss);
       
-      if (SCRIPT_URL) {
-        var sessionData = {
-          action: 'update_session_attendance',
-          u: ss ? ss.u : '',
-          p: ss ? ss.p : '',
-          id: s.id,
-          status: 'completed',
-          endTime: endTime,
-          attendedMembers: JSON.stringify(attendedIds),
-          attendedCount: attendedCount
-        };
-        fetch(SCRIPT_URL, {
-          method: 'POST',
-          body: JSON.stringify(sessionData)
-        }).then(function(r) { return r.json(); })
-          .then(function(res) {
-            console.log("Saved session attendance to Sheet:", res);
-            syncData(function() { if (ss) rAttendance(ss); });
-          }).catch(console.error);
+      if (SCRIPT_URL && ss) {
+        var attParams = SCRIPT_URL + (SCRIPT_URL.indexOf('?') === -1 ? '?' : '&') +
+          'action=update_attendance' +
+          '&u=' + encodeURIComponent(ss.u) +
+          '&p=' + encodeURIComponent(ss.p) +
+          '&id=' + encodeURIComponent(s.id) +
+          '&endTime=' + encodeURIComponent(endTime) +
+          '&attendedMembers=' + encodeURIComponent(JSON.stringify(attendedIds)) +
+          '&attendedCount=' + encodeURIComponent(attendedCount) +
+          '&_t=' + Date.now();
+        fetch(attParams)
+          .then(function() { syncData(function() { if (ss) rAttendance(ss); }); })
+          .catch(console.error);
       }
     });
 
