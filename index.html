@@ -883,6 +883,26 @@
     .member-checklist-row:hover {
       background: #fafafa;
     }
+    .att-status-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-left: auto;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .att-status-badge.present {
+      background: var(--gbg);
+      color: var(--green);
+      border: 0.5px solid #86efac;
+    }
+    .att-status-badge.absent {
+      background: #f5f5f7;
+      color: var(--t2);
+      border: 0.5px solid #e2e2e2;
+    }
     .checklist-cb {
       width: 20px;
       height: 20px;
@@ -1542,9 +1562,10 @@
     <div class="lcrd" style="max-width: 500px; background: #fff; padding: 28px; max-height: 90vh; overflow-y: auto;">
       <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 18px; text-align: center;" id="session-modal-title">Create New Session</h2>
       <form id="sfm" novalidate>
+        <input type="hidden" id="s-id" />
         <div class="fg">
           <label for="s-topic">Topic / Kitab Name <span class="rq">*</span></label>
-          <input type="text" id="s-topic" placeholder="e.g. سُلطانُ العُلماء — Chapter 3" />
+          <input type="text" id="s-topic" placeholder="" />
         </div>
         <div class="fr">
           <div class="fg">
@@ -1571,11 +1592,11 @@
         <div class="fr">
           <div class="fg">
             <label for="s-venue">Venue <span class="rq">*</span></label>
-            <input type="text" id="s-venue" placeholder="e.g. Hamad Town Masjid Hall" />
+            <input type="text" id="s-venue" placeholder="" />
           </div>
           <div class="fg">
             <label for="s-ustadh">Ustadh / Teacher name <span class="rq">*</span></label>
-            <input type="text" id="s-ustadh" placeholder="e.g. Ustadh Ahmad" />
+            <input type="text" id="s-ustadh" placeholder="" />
           </div>
         </div>
         <div class="fg">
@@ -1619,7 +1640,7 @@
           <p style="font-weight: 600; margin-bottom: 10px;" id="att-manual-msg"></p>
           <div class="fg" style="margin-bottom: 0;">
             <label for="att-manual-count" style="color: var(--amber);">Total members attended <span class="rq">*</span></label>
-            <input type="number" id="att-manual-count" min="0" placeholder="e.g. 10" style="border-color: #fcd34d;" />
+            <input type="number" id="att-manual-count" min="0" placeholder="" style="border-color: #fcd34d;" />
           </div>
         </div>
         
@@ -2460,15 +2481,14 @@
                '      ' + countLabel +
                '    </div>' +
                '    <div class="session-badges">' +
-               '      <span class="badge badge-unit">' + esc(s.unit) + '</span>' +
-               '      <span class="badge badge-sector">' + esc(s.sector) + '</span>' +
-               '    </div>' +
-               '  </div>' +
-               '  <div class="session-actions">' +
-               '    <button class="bsm bex" style="font-weight:700;" onclick="handleSessionAction(\'' + s.id + '\')">' + actionBtnText + '</button>' +
-               '    <span style="font-size:18px; cursor:pointer; color:var(--red);" onclick="deleteSession(\'' + s.id + '\')">🗑️</span>' +
-               '  </div>' +
-               '</div>';
+               '      <span class="badge badge-unit">' + esc(s.unit) +                 '  <div class="session-actions">' +
+                '    <button class="bsm bex" style="font-weight:700;" onclick="handleSessionAction(\'' + s.id + '\')">' + actionBtnText + '</button>' +
+                '    <div style="display: flex; gap: 10px; align-items: center;">' +
+                '      <span style="font-size:18px; cursor:pointer; color:var(--accent);" onclick="openEditSessionModal(\'' + s.id + '\')">✏️</span>' +
+                '      <span style="font-size:18px; cursor:pointer; color:var(--red);" onclick="deleteSession(\'' + s.id + '\')">🗑️</span>' +
+                '    </div>' +
+                '  </div>' +
+                '</div>';
       }).join('');
     }
 
@@ -2498,16 +2518,24 @@
     }
     window.handleSessionAction = handleSessionAction;
 
-    function openCreateSessionModal() {
+    function openEditSessionModal(id) {
+      var arr = gSessions();
+      var s = arr.find(function(item) { return String(item.id) === String(id); });
+      if (!s) return;
+      openCreateSessionModal(s);
+    }
+    window.openEditSessionModal = openEditSessionModal;
+
+    function openCreateSessionModal(s) {
       var ss = gSs();
       if (!ss) return;
       
       var form = document.getElementById('sfm');
       form.reset();
       
-      var now = new Date();
-      var today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
-      document.getElementById('s-date').value = today;
+      var titleEl = document.getElementById('session-modal-title');
+      var submitBtn = document.querySelector('#sfm button[type="submit"]');
+      var idInput = document.getElementById('s-id');
       
       var uSel = document.getElementById('s-unit');
       var secInput = document.getElementById('s-sector');
@@ -2530,16 +2558,40 @@
       } else if (ss.role === 'admin') {
         uSel.innerHTML = '<option value="">Choose...</option>';
         var keys = Object.keys(SU);
-        keys.forEach(function(s) {
-          SU[s].forEach(function(u) {
+        keys.forEach(function(sectName) {
+          SU[sectName].forEach(function(uName) {
             var opt = document.createElement('option');
-            opt.value = u;
-            opt.textContent = u + ' (' + s + ')';
+            opt.value = uName;
+            opt.textContent = uName + ' (' + sectName + ')';
             uSel.appendChild(opt);
           });
         });
         uSel.disabled = false;
         secInput.value = '';
+      }
+      
+      if (s) {
+        titleEl.textContent = 'Edit Session Details';
+        submitBtn.textContent = 'Update Session';
+        idInput.value = s.id;
+        
+        document.getElementById('s-topic').value = s.topic;
+        document.getElementById('s-date').value = s.date;
+        document.getElementById('s-class-num').value = s.classNumber;
+        uSel.value = s.unit;
+        secInput.value = s.sector;
+        document.getElementById('s-venue').value = s.venue;
+        document.getElementById('s-ustadh').value = s.ustadh;
+        document.getElementById('s-time').value = s.startTime;
+        document.getElementById('s-notes').value = s.notes || '';
+      } else {
+        titleEl.textContent = 'Create New Session';
+        submitBtn.textContent = 'Save Session';
+        idInput.value = '';
+        
+        var now = new Date();
+        var today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+        document.getElementById('s-date').value = today;
       }
       
       document.getElementById('session-modal').classList.add('on');
@@ -2572,6 +2624,7 @@
     document.getElementById('sfm').addEventListener('submit', function(e) {
       e.preventDefault();
       var ss = gSs();
+      var id = document.getElementById('s-id').value;
       var topic = document.getElementById('s-topic').value.trim();
       var date = document.getElementById('s-date').value;
       var classNum = document.getElementById('s-class-num').value.trim();
@@ -2588,27 +2641,42 @@
         return;
       }
       
-      var newSession = {
-        id: Date.now(),
-        topic: topic,
-        date: date,
-        unit: unitClean,
-        sector: sectorVal,
-        venue: venue,
-        ustadh: ustadh,
-        startTime: startTime,
-        classNumber: classNum,
-        notes: notes,
-        status: 'scheduled',
-        attendedMembers: [],
-        endTime: null,
-        attendedCount: 0
-      };
-      
       var arr = gSessions();
-      arr.push(newSession);
-      sSessions(arr);
       
+      if (id) {
+        var s = arr.find(function(item) { return String(item.id) === String(id); });
+        if (s) {
+          s.topic = topic;
+          s.date = date;
+          s.classNumber = classNum;
+          s.unit = unitClean;
+          s.sector = sectorVal;
+          s.venue = venue;
+          s.ustadh = ustadh;
+          s.startTime = startTime;
+          s.notes = notes;
+        }
+      } else {
+        var newSession = {
+          id: Date.now(),
+          topic: topic,
+          date: date,
+          unit: unitClean,
+          sector: sectorVal,
+          venue: venue,
+          ustadh: ustadh,
+          startTime: startTime,
+          classNumber: classNum,
+          notes: notes,
+          status: 'scheduled',
+          attendedMembers: [],
+          endTime: null,
+          attendedCount: 0
+        };
+        arr.push(newSession);
+      }
+      
+      sSessions(arr);
       closeCreateSessionModal();
       if (ss) rAttendance(ss);
     });
@@ -2639,6 +2707,7 @@
                  '    <div style="font-weight:600; color:var(--text);">' + esc(r.name) + '</div>' +
                  '    <div class="tm" style="margin-top:2px;">WhatsApp: ' + esc(r.whatsapp) + '</div>' +
                  '  </div>' +
+                 '  <span class="att-status-badge absent">Absent</span>' +
                  '</div>';
         }).join('');
       } else {
@@ -2660,7 +2729,17 @@
     function toggleChecklistCheckbox(rowEl, id) {
       var cb = rowEl.querySelector('.checklist-cb');
       if (!cb || cb.classList.contains('disabled')) return;
-      cb.classList.toggle('checked');
+      var isChecked = cb.classList.toggle('checked');
+      var badge = rowEl.querySelector('.att-status-badge');
+      if (badge) {
+        if (isChecked) {
+          badge.className = 'att-status-badge present';
+          badge.textContent = 'Attended';
+        } else {
+          badge.className = 'att-status-badge absent';
+          badge.textContent = 'Absent';
+        }
+      }
     }
     window.toggleChecklistCheckbox = toggleChecklistCheckbox;
 
@@ -2730,10 +2809,19 @@
         rows.forEach(function(row) {
           var cb = row.querySelector('.checklist-cb');
           var mId = cb.getAttribute('data-member-id');
+          var badge = row.querySelector('.att-status-badge');
           if (session.attendedMembers && session.attendedMembers.indexOf(mId) !== -1) {
             cb.classList.add('checked');
+            if (badge) {
+              badge.className = 'att-status-badge present';
+              badge.textContent = 'Attended';
+            }
           } else {
             cb.classList.remove('checked');
+            if (badge) {
+              badge.className = 'att-status-badge absent';
+              badge.textContent = 'Absent';
+            }
           }
           cb.classList.add('disabled');
         });
