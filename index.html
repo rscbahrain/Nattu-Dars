@@ -768,8 +768,238 @@
       justify-content: center;
     }
 
-    .modal.on {
+    .home-card {
       display: flex;
+      align-items: center;
+      gap: 20px;
+      background: var(--card);
+      border: var(--b);
+      border-radius: var(--r);
+      padding: 24px;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+    .home-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    .home-icon-bubble {
+      font-size: 32px;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .session-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+    @media (max-width: 600px) {
+      .session-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .session-card {
+      background: var(--card);
+      border: var(--b);
+      border-radius: var(--r);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: box-shadow 0.15s;
+    }
+    .session-card:hover {
+      box-shadow: 0 3px 8px rgba(0,0,0,0.04);
+    }
+    .session-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .session-topic {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.3;
+    }
+    .session-meta {
+      font-size: 12px;
+      color: var(--t2);
+      margin-top: 8px;
+    }
+    .session-badges {
+      display: flex;
+      gap: 4px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .status-badge.scheduled {
+      background: var(--abg);
+      color: var(--amber);
+    }
+    .status-badge.completed {
+      background: var(--gbg);
+      color: var(--green);
+    }
+    .session-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 18px;
+      border-top: var(--b);
+      padding-top: 12px;
+    }
+    .member-checklist-row {
+      display: flex;
+      align-items: center;
+      padding: 10px 14px;
+      border-bottom: var(--b);
+      cursor: pointer;
+      user-select: none;
+    }
+    .member-checklist-row:last-child {
+      border-bottom: none;
+    }
+    .member-checklist-row:hover {
+      background: #fafafa;
+    }
+    .checklist-cb {
+      width: 20px;
+      height: 20px;
+      border: 1px solid #c8c8c8;
+      border-radius: 4px;
+      margin-right: 12px;
+      flex-shrink: 0;
+      position: relative;
+      cursor: pointer;
+      background: #fff;
+    }
+    .checklist-cb.checked {
+      background: var(--green);
+      border-color: var(--green);
+    }
+    .checklist-cb.checked::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -52%);
+      color: #fff;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .attendance-chart-container {
+      position: relative;
+      height: 220px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      border-bottom: 2px solid #ccc;
+      border-left: 2px solid #ccc;
+      padding-top: 30px;
+      padding-right: 10px;
+      margin-bottom: 32px;
+      margin-top: 10px;
+    }
+    .attendance-chart-bar-wrapper {
+      position: relative;
+      flex: 1;
+      margin: 0 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      height: 100%;
+    }
+    .attendance-chart-bar {
+      background: var(--green);
+      border-radius: 4px 4px 0 0;
+      width: 100%;
+      max-width: 48px;
+      cursor: pointer;
+      position: relative;
+      transition: background-color 0.2s;
+    }
+    .attendance-chart-bar:hover {
+      background: var(--accent);
+    }
+    .attendance-chart-bar .bar-label-val {
+      position: absolute;
+      top: -22px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-weight: 700;
+      font-size: 11px;
+      color: var(--text);
+    }
+    .attendance-chart-bar .bar-label-class {
+      position: absolute;
+      bottom: -22px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      color: var(--t2);
+      white-space: nowrap;
+      font-weight: 600;
+    }
+    .attendance-chart-bar .chart-tooltip {
+      display: none;
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.85);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      line-height: 1.4;
+      white-space: nowrap;
+      z-index: 10;
+      margin-bottom: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      pointer-events: none;
+      text-align: left;
+    }
+    .attendance-chart-bar:hover .chart-tooltip {
+      display: block;
+    }
+    .chart-avg-line {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      border-top: 2px dashed #999;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .chart-avg-label {
+      position: absolute;
+      right: 8px;
+      top: -18px;
+      font-size: 10px;
+      background: var(--card);
+      border: var(--b);
+      border-radius: 4px;
+      padding: 1px 6px;
+      color: var(--t2);
+      font-weight: 700;
     }
   </style>
 </head>
@@ -875,6 +1105,44 @@
       </div>
     </div>
 
+    <!-- ADMIN HOME VIEW -->
+    <div id="av-home" class="av">
+      <div class="wrap" style="max-width: 600px;">
+        <div class="rbar" style="margin-bottom: 32px;">
+          <div class="rinfo">
+            <span class="bdg" id="home-role-bdg" style="text-transform: uppercase;"></span>
+            <span class="rname" id="home-role-name"></span>
+          </div>
+          <button class="blo btn-logout-color" onclick="doOut()">Logout</button>
+        </div>
+        
+        <div style="text-align: center; margin-bottom: 36px;">
+          <h2 style="font-size: 24px; font-weight: 700; color: var(--accent);">Admin Panel</h2>
+          <p style="font-size: 13px; color: var(--t2); margin-top: 4px;">Choose a section to manage</p>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr; gap: 18px;">
+          <!-- Registrations Dashboard Card -->
+          <div class="home-card" onclick="goSection('dashboard')">
+            <div class="home-icon-bubble" style="background: var(--al); color: var(--accent);">📊</div>
+            <div>
+              <h3 style="font-size: 16px; font-weight: 700; color: var(--text);">Registrations Dashboard</h3>
+              <p style="font-size: 13px; color: var(--t2); margin-top: 4px; line-height: 1.4;">View registration statistics, charts & list</p>
+            </div>
+          </div>
+          
+          <!-- Attendance Card -->
+          <div class="home-card" onclick="goSection('attendance')">
+            <div class="home-icon-bubble" style="background: #dcfce7; color: #15803d;">🗓️</div>
+            <div>
+              <h3 style="font-size: 16px; font-weight: 700; color: var(--text);">Attendance</h3>
+              <p style="font-size: 13px; color: var(--t2); margin-top: 4px; line-height: 1.4;">Log class sessions, venue, ustadh & attendance count</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- UNIT DASHBOARD -->
     <div id="av-unit" class="av">
       <div class="wrap">
@@ -882,7 +1150,7 @@
           <div class="rinfo"><span class="bdg bu">Unit Committee</span><span class="rname" id="urn"></span></div>
           <div style="display: flex; gap: 8px;">
             <button class="blo btn-sync-color" id="btn-sync-u" onclick="triggerSync()">Refresh</button>
-            <button class="blo btn-logout-color" onclick="doOut()">Logout</button>
+            <button class="blo" onclick="goHome()">Back</button>
           </div>
         </div>
         <div class="stl">My Unit Overview</div>
@@ -934,7 +1202,7 @@
           <div class="rinfo"><span class="bdg bs">Sector Committee</span><span class="rname" id="srn"></span></div>
           <div style="display: flex; gap: 8px;">
             <button class="blo btn-sync-color" id="btn-sync-s" onclick="triggerSync()">Refresh</button>
-            <button class="blo btn-logout-color" onclick="doOut()">Logout</button>
+            <button class="blo" onclick="goHome()">Back</button>
           </div>
         </div>
         <div class="stl">Sector Overview</div>
@@ -993,7 +1261,7 @@
           <div class="rinfo"><span class="bdg ba">RSC Bahrain</span><span class="rname">Full Access</span></div>
           <div style="display: flex; gap: 8px;">
             <button class="blo btn-sync-color" id="btn-sync-a" onclick="triggerSync()">Refresh</button>
-            <button class="blo btn-logout-color" onclick="doOut()">Logout</button>
+            <button class="blo" onclick="goHome()">Back</button>
           </div>
         </div>
         <div class="stl">Overview</div>
@@ -1067,6 +1335,143 @@
       </div>
     </div>
 
+    <!-- UNIT ATTENDANCE DASHBOARD -->
+    <div id="av-unit-attendance" class="av">
+      <div class="wrap">
+        <div class="rbar">
+          <div class="rinfo"><span class="bdg bu">Unit Committee</span><span class="rname" id="uan-urn"></span></div>
+          <div style="display: flex; gap: 8px;">
+            <button class="blo btn-sync-color" id="btn-sync-u-att" onclick="triggerSync()">Refresh</button>
+            <button class="blo" onclick="goHome()">Back</button>
+          </div>
+        </div>
+        
+        <div class="stl">Attendance Analytics</div>
+        <div class="sg">
+          <div class="sc">
+            <div class="sv" id="ua-s1">0</div>
+            <div class="sl">Sessions Completed</div>
+          </div>
+          <div class="sc">
+            <div class="sv" id="ua-s2">0</div>
+            <div class="sl">Avg Attendance</div>
+          </div>
+          <div class="sc">
+            <div class="sv" id="ua-s3" style="font-size: 16px; font-weight: 700; height: 30px; display: flex; align-items: center; justify-content: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">—</div>
+            <div class="sl">Best Class</div>
+          </div>
+        </div>
+        
+        <div class="stl">Attendance Comparison</div>
+        <div class="chc" id="ua-chart-card"></div>
+        
+        <div class="ttb" style="border-bottom: none; padding-left: 0; padding-right: 0; margin-top: 16px;">
+          <div class="stl" style="margin-top: 0; margin-bottom: 0;">Class Sessions</div>
+          <button class="bsm bex" style="background: var(--green); color: #fff; border-color: var(--green);" onclick="openCreateSessionModal()">+ Create Session</button>
+        </div>
+        
+        <div id="unit-sessions-grid" class="session-grid"></div>
+        <div id="unit-sessions-empty" class="ec" style="padding: 40px 0;">No sessions created yet. Click + Create Session to begin.</div>
+      </div>
+    </div>
+
+    <!-- SECTOR ATTENDANCE DASHBOARD -->
+    <div id="av-sector-attendance" class="av">
+      <div class="wrap">
+        <div class="rbar">
+          <div class="rinfo"><span class="bdg bs">Sector Committee</span><span class="rname" id="san-srn"></span></div>
+          <div style="display: flex; gap: 8px;">
+            <button class="blo btn-sync-color" id="btn-sync-s-att" onclick="triggerSync()">Refresh</button>
+            <button class="blo" onclick="goHome()">Back</button>
+          </div>
+        </div>
+        
+        <div class="stl">Attendance Analytics</div>
+        <div class="sg">
+          <div class="sc">
+            <div class="sv" id="sa-s1">0</div>
+            <div class="sl">Sessions Completed</div>
+          </div>
+          <div class="sc">
+            <div class="sv" id="sa-s2">0</div>
+            <div class="sl">Avg Attendance</div>
+          </div>
+          <div class="sc">
+            <div class="sv" id="sa-s3" style="font-size: 16px; font-weight: 700; height: 30px; display: flex; align-items: center; justify-content: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">—</div>
+            <div class="sl">Best Class</div>
+          </div>
+        </div>
+        
+        <div class="stl">Attendance Comparison</div>
+        <div class="chc" id="sa-chart-card"></div>
+        
+        <div class="ttb" style="border-bottom: none; padding-left: 0; padding-right: 0; margin-top: 16px; flex-wrap: wrap; gap: 8px;">
+          <div class="stl" style="margin-top: 0; margin-bottom: 0;">Class Sessions</div>
+          <div style="display: flex; gap: 8px; align-items: center; margin-left: auto;">
+            <select id="sa-filter-unit" class="fsel" onchange="renderSectorAttendance()">
+              <option value="">All Units</option>
+            </select>
+            <button class="bsm bex" style="background: var(--green); color: #fff; border-color: var(--green);" onclick="openCreateSessionModal()">+ Create Session</button>
+          </div>
+        </div>
+        
+        <div id="sector-sessions-grid" class="session-grid"></div>
+        <div id="sector-sessions-empty" class="ec" style="padding: 40px 0;">No sessions created yet.</div>
+      </div>
+    </div>
+
+    <!-- ADMIN ATTENDANCE DASHBOARD -->
+    <div id="av-admin-attendance" class="av">
+      <div class="wrap">
+        <div class="rbar">
+          <div class="rinfo"><span class="bdg ba">RSC Bahrain</span><span class="rname">Full Access</span></div>
+          <div style="display: flex; gap: 8px;">
+            <button class="blo btn-sync-color" id="btn-sync-a-att" onclick="triggerSync()">Refresh</button>
+            <button class="blo" onclick="goHome()">Back</button>
+          </div>
+        </div>
+        
+        <div class="stl">Attendance Analytics</div>
+        <div class="sg">
+          <div class="sc">
+            <div class="sv" id="ada-s1">0</div>
+            <div class="sl">Sessions Completed</div>
+          </div>
+          <div class="sc">
+            <div class="sv" id="ada-s2">0</div>
+            <div class="sl">Avg Attendance</div>
+          </div>
+          <div class="sc">
+            <div class="sv" id="ada-s3" style="font-size: 16px; font-weight: 700; height: 30px; display: flex; align-items: center; justify-content: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">—</div>
+            <div class="sl">Best Class</div>
+          </div>
+        </div>
+        
+        <div class="stl">Attendance Comparison</div>
+        <div class="chc" id="ada-chart-card"></div>
+        
+        <div class="ttb" style="border-bottom: none; padding-left: 0; padding-right: 0; margin-top: 16px; flex-wrap: wrap; gap: 8px;">
+          <div class="stl" style="margin-top: 0; margin-bottom: 0;">Class Sessions</div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-left: auto;">
+            <select id="ada-filter-sector" class="fsel" onchange="onAdminAttendanceSectorChange()">
+              <option value="">All Sectors</option>
+              <option>GUDAIBIYA</option><option>CASENO</option><option>HIDD</option>
+              <option>JUFFAIR</option><option>SALMABAD</option><option>SALMANIYA</option>
+              <option>BUDAYYA</option><option>KHALEEFA</option><option>SANAD</option>
+              <option>HAMAD TOWN</option><option>ISA TOWN</option>
+            </select>
+            <select id="ada-filter-unit" class="fsel" onchange="renderAdminAttendance()">
+              <option value="">All Units</option>
+            </select>
+            <button class="bsm bex" style="background: var(--green); color: #fff; border-color: var(--green);" onclick="openCreateSessionModal()">+ Create Session</button>
+          </div>
+        </div>
+        
+        <div id="admin-sessions-grid" class="session-grid"></div>
+        <div id="admin-sessions-empty" class="ec" style="padding: 40px 0;">No sessions created yet. Click + Create Session to begin.</div>
+      </div>
+    </div>
+
   </div>
 
   <!-- EDIT MODAL -->
@@ -1129,6 +1534,100 @@
     </div>
   </div>
 
+  <!-- CREATE SESSION MODAL -->
+  <div id="session-modal" class="modal">
+    <div class="lcrd" style="max-width: 500px; background: #fff; padding: 28px; max-height: 90vh; overflow-y: auto;">
+      <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 18px; text-align: center;" id="session-modal-title">Create New Session</h2>
+      <form id="sfm" novalidate>
+        <div class="fg">
+          <label for="s-topic">Topic / Kitab Name <span class="rq">*</span></label>
+          <input type="text" id="s-topic" placeholder="e.g. سُلطانُ العُلماء — Chapter 3" required />
+        </div>
+        <div class="fr">
+          <div class="fg">
+            <label for="s-date">Date <span class="rq">*</span></label>
+            <input type="date" id="s-date" required />
+          </div>
+          <div class="fg">
+            <label for="s-class-num">Class number (out of 30) <span class="rq">*</span></label>
+            <input type="number" id="s-class-num" min="1" max="30" placeholder="1-30" required />
+          </div>
+        </div>
+        <div class="fr">
+          <div class="fg">
+            <label for="s-unit">Unit <span class="rq">*</span></label>
+            <select id="s-unit" required>
+              <option value="">Choose...</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label for="s-sector">Sector</label>
+            <input type="text" id="s-sector" readonly style="background: #f5f5f7; cursor: not-allowed; border-color: #e2e2e2;" />
+          </div>
+        </div>
+        <div class="fr">
+          <div class="fg">
+            <label for="s-venue">Venue <span class="rq">*</span></label>
+            <input type="text" id="s-venue" placeholder="e.g. Hamad Town Masjid Hall" required />
+          </div>
+          <div class="fg">
+            <label for="s-ustadh">Ustadh / Teacher name <span class="rq">*</span></label>
+            <input type="text" id="s-ustadh" placeholder="e.g. Ustadh Ahmad" required />
+          </div>
+        </div>
+        <div class="fg">
+          <label for="s-time">Start Time <span class="rq">*</span></label>
+          <input type="time" id="s-time" required />
+        </div>
+        <div class="fg">
+          <label for="s-notes">Notes</label>
+          <textarea id="s-notes" style="width:100%; min-height:80px; padding:9px 12px; border-radius:var(--rs); border:0.5px solid #c8c8c8; font-family:inherit; font-size:14px; outline:none; resize:vertical;"></textarea>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 24px;">
+          <button type="submit" class="btnp" style="flex: 1; margin-top: 0; background: var(--green);">Save Session</button>
+          <button type="button" class="blo" style="flex: 1;" onclick="closeCreateSessionModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MARK ATTENDANCE MODAL -->
+  <div id="attendance-modal" class="modal">
+    <div class="lcrd" style="max-width: 500px; background: #fff; padding: 28px; max-height: 90vh; overflow-y: auto;">
+      <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 6px; text-align: center;">Mark Class Attendance</h2>
+      <div id="att-session-info" style="font-size: 13px; color: var(--t2); text-align: center; margin-bottom: 20px; line-height: 1.4; padding-bottom: 12px; border-bottom: var(--b);"></div>
+      
+      <form id="afm" novalidate>
+        <input type="hidden" id="att-session-id" />
+        
+        <div class="fg" style="margin-bottom: 20px;">
+          <label for="att-end-time">Class End Time <span class="rq">*</span></label>
+          <input type="time" id="att-end-time" required />
+        </div>
+        
+        <div class="stl" style="margin-top: 0;">Attendance Checklist</div>
+        
+        <!-- Checklist container or Manual input -->
+        <div id="att-checklist-wrapper" style="border: var(--b); border-radius: var(--rs); max-height: 250px; overflow-y: auto; margin-bottom: 24px; background: #fafafa;">
+          <div id="att-member-checklist"></div>
+        </div>
+        
+        <div id="att-manual-wrapper" style="display: none; padding: 14px; background: var(--abg); color: var(--amber); border-radius: var(--rs); border: 0.5px solid #fcd34d; font-size: 13px; margin-bottom: 24px;">
+          <p style="font-weight: 600; margin-bottom: 10px;" id="att-manual-msg"></p>
+          <div class="fg" style="margin-bottom: 0;">
+            <label for="att-manual-count" style="color: var(--amber);">Total members attended <span class="rq">*</span></label>
+            <input type="number" id="att-manual-count" min="0" placeholder="e.g. 10" style="border-color: #fcd34d;" />
+          </div>
+        </div>
+        
+        <div style="display: flex; gap: 10px;">
+          <button type="submit" class="btnp" style="flex: 1; margin-top: 0; background: var(--green);">Save Attendance</button>
+          <button type="button" class="blo" style="flex: 1;" onclick="closeAttendanceModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
     var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx3Co2v35os5UZzelPIG-Hno6knbGrdaSlhkaX11s2tK-Np3gwk840zSqLNtKzsGrU-/exec';
     var SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/1iPG9HTLKlMls9L2_Ve0SGQj5mP52t827FRzm0QZsllk/edit?gid=0#gid=0';
@@ -1146,14 +1645,46 @@
       'JUFFAIR': ['ADLIYA', 'JAZEERA', 'UM AL HASAM'],
       'CASENO': ['BUSAITHEEN', 'HALA', 'MUHARRAQ SOUQ', 'AIRPORT']
     };
-    function gR() { try { return JSON.parse(localStorage.getItem(LS)) || []; } catch (e) { return []; } }
-    function sR(a) { localStorage.setItem(LS, JSON.stringify(a)); }
+    // Safety localStorage / sessionStorage polyfill for file:// protocols
+    var memoryStorage = {};
+    var safeLocalStorage = {
+      getItem: function(key) {
+        try { return localStorage.getItem(key); }
+        catch(e) { return memoryStorage[key] || null; }
+      },
+      setItem: function(key, val) {
+        try { localStorage.setItem(key, val); }
+        catch(e) { memoryStorage[key] = String(val); }
+      },
+      removeItem: function(key) {
+        try { localStorage.removeItem(key); }
+        catch(e) { delete memoryStorage[key]; }
+      }
+    };
+    var memorySessionStorage = {};
+    var safeSessionStorage = {
+      getItem: function(key) {
+        try { return sessionStorage.getItem(key); }
+        catch(e) { return memorySessionStorage[key] || null; }
+      },
+      setItem: function(key, val) {
+        try { sessionStorage.setItem(key, val); }
+        catch(e) { memorySessionStorage[key] = String(val); }
+      },
+      removeItem: function(key) {
+        try { sessionStorage.removeItem(key); }
+        catch(e) { delete memorySessionStorage[key]; }
+      }
+    };
+
+    function gR() { try { return JSON.parse(safeLocalStorage.getItem(LS)) || []; } catch (e) { return []; } }
+    function sR(a) { try { safeLocalStorage.setItem(LS, JSON.stringify(a)); } catch (e) {} }
     function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
     function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
     function nm(s) { return String(s || '').toUpperCase().trim(); }
-    function gSs() { try { return JSON.parse(sessionStorage.getItem(SS)) || null; } catch (e) { return null; } }
-    function sSs(o) { sessionStorage.setItem(SS, JSON.stringify(o)); }
-    function cSs() { sessionStorage.removeItem(SS); }
+    function gSs() { try { return JSON.parse(safeSessionStorage.getItem(SS)) || null; } catch (e) { return null; } }
+    function sSs(o) { try { safeSessionStorage.setItem(SS, JSON.stringify(o)); } catch (e) {} }
+    function cSs() { try { safeSessionStorage.removeItem(SS); } catch (e) {} }
     function syncData(cb) {
       if (!SCRIPT_URL) { if (cb) cb(); return; }
       var ss = gSs();
@@ -1184,8 +1715,9 @@
         if (!ss) {
           sView('l');
         } else {
-          sView(ss.role);
-          syncData(function () { rRole(ss); });
+          sView('home');
+          rHome(ss);
+          syncData();
         }
       }
     }
@@ -1254,8 +1786,8 @@
             if (unit) ss.unit = unit;
             sSs(ss);
             document.getElementById('lfm').reset();
-            sView(role);
-            rRole(ss);
+            sView('home');
+            rHome(ss);
           } else {
             err.textContent = 'Server response error. Please try again.';
             err.hidden = false;
@@ -1267,7 +1799,7 @@
           err.hidden = false;
         });
     });
-    function doOut() { cSs(); localStorage.removeItem(LS); sView('l'); document.getElementById('lu').value = ''; document.getElementById('lp').value = ''; document.getElementById('lerr').hidden = true; }
+    function doOut() { cSs(); try { safeLocalStorage.removeItem(LS); safeLocalStorage.removeItem('nattudars_sessions'); } catch (e) {} sView('l'); document.getElementById('lu').value = ''; document.getElementById('lp').value = ''; document.getElementById('lerr').hidden = true; }
     window.triggerSync = function () {
       var ss = gSs();
       if (!ss) return;
@@ -1655,11 +2187,575 @@
       var ss = gSs();
       if (ss) rRole(ss);
     });
+
+    function goSection(sec) {
+      var ss = gSs();
+      if (!ss) return;
+      if (sec === 'dashboard') {
+        sView(ss.role);
+        rRole(ss);
+      } else if (sec === 'attendance') {
+        sView(ss.role + '-attendance');
+        rAttendance(ss);
+      }
+    }
+    window.goSection = goSection;
+
+    function goHome() {
+      var ss = gSs();
+      if (ss) {
+        sView('home');
+        rHome(ss);
+      } else {
+        sView('l');
+      }
+    }
+    window.goHome = goHome;
+
+    function rHome(ss) {
+      var bdg = document.getElementById('home-role-bdg');
+      var name = document.getElementById('home-role-name');
+      if (!bdg || !name) return;
+      if (ss.role === 'admin') {
+        bdg.className = 'bdg ba';
+        bdg.textContent = 'RSC Bahrain';
+        name.textContent = 'Full Access';
+      } else if (ss.role === 'sector') {
+        bdg.className = 'bdg bs';
+        bdg.textContent = 'Sector';
+        name.textContent = ss.sector + ' Sector';
+      } else if (ss.role === 'unit') {
+        bdg.className = 'bdg bu';
+        bdg.textContent = 'Unit';
+        name.textContent = ss.unit + ' — ' + ss.sector;
+      }
+    }
+    window.rHome = rHome;
+
+    function rAttendance(ss) {
+      if (ss.role === 'unit') rUnitAttendance(ss);
+      else if (ss.role === 'sector') rSectorAttendance(ss);
+      else if (ss.role === 'admin') rAdminAttendance();
+    }
+    window.rAttendance = rAttendance;
+
+    function gSessions() {
+      try { return JSON.parse(safeLocalStorage.getItem('nattudars_sessions')) || []; }
+      catch(e) { return []; }
+    }
+
+    function sSessions(arr) {
+      try { safeLocalStorage.setItem('nattudars_sessions', JSON.stringify(arr)); } catch (e) {}
+    }
+
+    function rUnitAttendance(ss) {
+      var un = ss.unit, sn = ss.sector;
+      var urnEl = document.getElementById('uan-urn');
+      if (urnEl) urnEl.textContent = un + ' — ' + sn + ' Sector';
+      
+      var sessions = gSessions().filter(function(s) { return nm(s.unit) === nm(un); });
+      var completed = sessions.filter(function(s) { return s.status === 'completed'; });
+      
+      document.getElementById('ua-s1').textContent = completed.length;
+      
+      var overallAttended = 0;
+      completed.forEach(function(s) { overallAttended += (s.attendedCount || 0); });
+      var avg = completed.length > 0 ? Math.round(overallAttended / completed.length) : 0;
+      document.getElementById('ua-s2').textContent = avg;
+      
+      var bestClass = '—';
+      var bestCount = -1;
+      completed.forEach(function(s) {
+        if ((s.attendedCount || 0) > bestCount) {
+          bestCount = s.attendedCount;
+          bestClass = s.topic + ' (' + s.attendedCount + ')';
+        }
+      });
+      document.getElementById('ua-s3').textContent = bestClass;
+      
+      renderCSSChart('ua-chart-card', completed, avg);
+      renderSessionsGrid('unit-sessions-grid', 'unit-sessions-empty', sessions);
+    }
+
+    function rSectorAttendance(ss) {
+      var sn = ss.sector;
+      var srnEl = document.getElementById('san-srn');
+      if (srnEl) srnEl.textContent = sn + ' Sector';
+      
+      var units = SU[sn] || [];
+      var uSel = document.getElementById('sa-filter-unit');
+      var prevVal = uSel.value;
+      uSel.innerHTML = '<option value="">All Units</option>';
+      units.forEach(function(u) {
+        var opt = document.createElement('option');
+        opt.value = u;
+        opt.textContent = u;
+        uSel.appendChild(opt);
+      });
+      uSel.value = prevVal;
+      var fu = uSel.value;
+      
+      var sessions = gSessions().filter(function(s) { return nm(s.sector) === nm(sn); });
+      if (fu) sessions = sessions.filter(function(s) { return nm(s.unit) === nm(fu); });
+      
+      var completed = sessions.filter(function(s) { return s.status === 'completed'; });
+      
+      document.getElementById('sa-s1').textContent = completed.length;
+      var overallAttended = 0;
+      completed.forEach(function(s) { overallAttended += (s.attendedCount || 0); });
+      var avg = completed.length > 0 ? Math.round(overallAttended / completed.length) : 0;
+      document.getElementById('sa-s2').textContent = avg;
+      
+      var bestClass = '—';
+      var bestCount = -1;
+      completed.forEach(function(s) {
+        if ((s.attendedCount || 0) > bestCount) {
+          bestCount = s.attendedCount;
+          bestClass = s.topic + ' (' + s.attendedCount + ')';
+        }
+      });
+      document.getElementById('sa-s3').textContent = bestClass;
+      
+      renderCSSChart('sa-chart-card', completed, avg);
+      renderSessionsGrid('sector-sessions-grid', 'sector-sessions-empty', sessions);
+    }
+
+    function rAdminAttendance() {
+      var sec = document.getElementById('ada-filter-sector').value;
+      var un = document.getElementById('ada-filter-unit').value;
+      
+      var sessions = gSessions();
+      if (sec) sessions = sessions.filter(function(s) { return nm(s.sector) === nm(sec); });
+      if (un) sessions = sessions.filter(function(s) { return nm(s.unit) === nm(un); });
+      
+      var completed = sessions.filter(function(s) { return s.status === 'completed'; });
+      
+      document.getElementById('ada-s1').textContent = completed.length;
+      var overallAttended = 0;
+      completed.forEach(function(s) { overallAttended += (s.attendedCount || 0); });
+      var avg = completed.length > 0 ? Math.round(overallAttended / completed.length) : 0;
+      document.getElementById('ada-s2').textContent = avg;
+      
+      var bestClass = '—';
+      var bestCount = -1;
+      completed.forEach(function(s) {
+        if ((s.attendedCount || 0) > bestCount) {
+          bestCount = s.attendedCount;
+          bestClass = s.topic + ' (' + s.attendedCount + ')';
+        }
+      });
+      document.getElementById('ada-s3').textContent = bestClass;
+      
+      renderCSSChart('ada-chart-card', completed, avg);
+      renderSessionsGrid('admin-sessions-grid', 'admin-sessions-empty', sessions);
+    }
+
+    window.onAdminAttendanceSectorChange = function() {
+      var sec = document.getElementById('ada-filter-sector').value;
+      var uSel = document.getElementById('ada-filter-unit');
+      uSel.innerHTML = '<option value="">All Units</option>';
+      if (sec && SU[sec]) {
+        SU[sec].forEach(function(u) {
+          var opt = document.createElement('option');
+          opt.value = u;
+          opt.textContent = u;
+          uSel.appendChild(opt);
+        });
+      }
+      renderAdminAttendance();
+    };
+
+    function renderCSSChart(containerId, completed, avg) {
+      var container = document.getElementById(containerId);
+      if (!container) return;
+      
+      if (completed.length < 2) {
+        container.innerHTML = '<div class="ec" style="padding: 30px 0;">Complete at least 2 sessions to see the comparison graph.</div>';
+        return;
+      }
+      
+      var sorted = completed.slice().sort(function(a, b) {
+        return parseInt(a.classNumber || 0) - parseInt(b.classNumber || 0);
+      });
+      
+      var maxCount = 0;
+      sorted.forEach(function(s) {
+        if ((s.attendedCount || 0) > maxCount) maxCount = s.attendedCount;
+      });
+      if (maxCount === 0) maxCount = 1;
+      
+      var html = '<div class="attendance-chart-container">';
+      
+      sorted.forEach(function(s) {
+        var count = s.attendedCount || 0;
+        var pct = (count / maxCount * 100).toFixed(1);
+        var clsNum = s.classNumber || '—';
+        
+        html += '<div class="attendance-chart-bar-wrapper">';
+        html += '  <div class="attendance-chart-bar" style="height: ' + pct + '%;">';
+        html += '    <span class="bar-label-val">' + count + '</span>';
+        html += '    <span class="bar-label-class">Class ' + clsNum + '</span>';
+        html += '    <div class="chart-tooltip">';
+        html += '      <strong>Topic:</strong> ' + esc(s.topic) + '<br>';
+        html += '      <strong>Date:</strong> ' + esc(s.date) + '<br>';
+        html += '      <strong>Venue:</strong> ' + esc(s.venue) + '<br>';
+        html += '      <strong>Ustadh:</strong> ' + esc(s.ustadh) + '<br>';
+        html += '      <strong>Attended:</strong> ' + count;
+        html += '    </div>';
+        html += '  </div>';
+        html += '</div>';
+      });
+      
+      var avgPct = (avg / maxCount * 100).toFixed(1);
+      html += '  <div class="chart-avg-line" style="bottom: ' + avgPct + '%;">';
+      html += '    <span class="chart-avg-label">Avg: ' + avg + ' members</span>';
+      html += '  </div>';
+      
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
+    function renderSessionsGrid(gridId, emptyId, sessions) {
+      var grid = document.getElementById(gridId);
+      var empty = document.getElementById(emptyId);
+      if (!grid || !empty) return;
+      
+      if (sessions.length === 0) {
+        grid.style.display = 'none';
+        empty.style.display = 'block';
+        return;
+      }
+      
+      grid.style.display = 'grid';
+      empty.style.display = 'none';
+      
+      var disp = sessions.slice().reverse();
+      grid.innerHTML = disp.map(function(s) {
+        var isScheduled = s.status === 'scheduled';
+        var actionBtnText = isScheduled ? 'Mark Attendance' : 'View';
+        var statusClass = isScheduled ? 'scheduled' : 'completed';
+        var statusLabel = isScheduled ? 'Scheduled' : 'Completed';
+        
+        var countLabel = '';
+        if (!isScheduled) {
+          countLabel = '<div style="font-size: 13px; font-weight: 700; color: var(--green); margin-top: 8px;">' + (s.attendedCount || 0) + ' attended</div>';
+        }
+        
+        var timeMeta = s.startTime;
+        if (s.endTime) timeMeta += ' - ' + s.endTime;
+        
+        return '<div class="session-card">' +
+               '  <div>' +
+               '    <div class="session-header">' +
+               '      <div class="session-topic">' + esc(s.topic) + '</div>' +
+               '      <span class="status-badge ' + statusClass + '">' + statusLabel + '</span>' +
+               '    </div>' +
+               '    <div class="session-meta">' +
+               '      <div>📅 <strong>' + esc(s.date) + '</strong> &middot; 📍 ' + esc(s.venue) + '</div>' +
+               '      <div style="margin-top: 4px;">👤 Ustadh: ' + esc(s.ustadh) + ' &middot; 🕒 ' + esc(timeMeta) + '</div>' +
+               '      <div style="margin-top: 4px; font-weight: 600;">📖 Class number ' + (s.classNumber || '—') + ' of 30</div>' +
+               '      ' + countLabel +
+               '    </div>' +
+               '    <div class="session-badges">' +
+               '      <span class="badge badge-unit">' + esc(s.unit) + '</span>' +
+               '      <span class="badge badge-sector">' + esc(s.sector) + '</span>' +
+               '    </div>' +
+               '  </div>' +
+               '  <div class="session-actions">' +
+               '    <button class="bsm bex" style="font-weight:700;" onclick="handleSessionAction(\'' + s.id + '\')">' + actionBtnText + '</button>' +
+               '    <span style="font-size:18px; cursor:pointer; color:var(--red);" onclick="deleteSession(\'' + s.id + '\')">🗑️</span>' +
+               '  </div>' +
+               '</div>';
+      }).join('');
+    }
+
+    function deleteSession(id) {
+      if (!confirm('Are you sure you want to delete this session?')) return;
+      var arr = gSessions();
+      var index = arr.findIndex(function(s) { return String(s.id) === String(id); });
+      if (index !== -1) {
+        arr.splice(index, 1);
+        sSessions(arr);
+        var ss = gSs();
+        if (ss) rAttendance(ss);
+      }
+    }
+    window.deleteSession = deleteSession;
+
+    function handleSessionAction(id) {
+      var arr = gSessions();
+      var s = arr.find(function(item) { return String(item.id) === String(id); });
+      if (!s) return;
+      
+      if (s.status === 'scheduled') {
+        openAttendanceModal(s);
+      } else {
+        openViewAttendanceModal(s);
+      }
+    }
+    window.handleSessionAction = handleSessionAction;
+
+    function openCreateSessionModal() {
+      var ss = gSs();
+      if (!ss) return;
+      
+      var form = document.getElementById('sfm');
+      form.reset();
+      
+      var now = new Date();
+      var today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+      document.getElementById('s-date').value = today;
+      
+      var uSel = document.getElementById('s-unit');
+      var secInput = document.getElementById('s-sector');
+      
+      if (ss.role === 'unit') {
+        uSel.innerHTML = '<option value="' + ss.unit + '">' + ss.unit + '</option>';
+        uSel.value = ss.unit;
+        uSel.disabled = true;
+        secInput.value = ss.sector;
+      } else if (ss.role === 'sector') {
+        uSel.innerHTML = '<option value="">Choose...</option>';
+        (SU[ss.sector] || []).forEach(function(u) {
+          var opt = document.createElement('option');
+          opt.value = u;
+          opt.textContent = u;
+          uSel.appendChild(opt);
+        });
+        uSel.disabled = false;
+        secInput.value = ss.sector;
+      } else if (ss.role === 'admin') {
+        uSel.innerHTML = '<option value="">Choose...</option>';
+        var keys = Object.keys(SU);
+        keys.forEach(function(s) {
+          SU[s].forEach(function(u) {
+            var opt = document.createElement('option');
+            opt.value = u;
+            opt.textContent = u + ' (' + s + ')';
+            uSel.appendChild(opt);
+          });
+        });
+        uSel.disabled = false;
+        secInput.value = '';
+      }
+      
+      document.getElementById('session-modal').classList.add('on');
+    }
+    window.openCreateSessionModal = openCreateSessionModal;
+
+    function closeCreateSessionModal() {
+      document.getElementById('session-modal').classList.remove('on');
+    }
+    window.closeCreateSessionModal = closeCreateSessionModal;
+
+    document.getElementById('s-unit').addEventListener('change', function() {
+      var unitVal = this.value;
+      var secInput = document.getElementById('s-sector');
+      if (!unitVal) {
+        secInput.value = '';
+        return;
+      }
+      var unitNameOnly = unitVal.split(' (')[0];
+      var keys = Object.keys(SU);
+      for (var i = 0; i < keys.length; i++) {
+        var s = keys[i];
+        if (SU[s].indexOf(unitNameOnly) !== -1) {
+          secInput.value = s;
+          break;
+        }
+      }
+    });
+
+    document.getElementById('sfm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var ss = gSs();
+      var topic = document.getElementById('s-topic').value.trim();
+      var date = document.getElementById('s-date').value;
+      var classNum = document.getElementById('s-class-num').value.trim();
+      var unitVal = document.getElementById('s-unit').value;
+      var unitClean = (ss && ss.role === 'unit') ? ss.unit : unitVal.split(' (')[0];
+      var sectorVal = (ss && ss.role === 'unit') ? ss.sector : document.getElementById('s-sector').value;
+      var venue = document.getElementById('s-venue').value.trim();
+      var ustadh = document.getElementById('s-ustadh').value.trim();
+      var startTime = document.getElementById('s-time').value;
+      var notes = document.getElementById('s-notes').value.trim();
+      
+      if (!topic || !date || !classNum || !unitClean || !venue || !ustadh || !startTime) {
+        alert('Please fill in all required fields.');
+        return;
+      }
+      
+      var newSession = {
+        id: Date.now(),
+        topic: topic,
+        date: date,
+        unit: unitClean,
+        sector: sectorVal,
+        venue: venue,
+        ustadh: ustadh,
+        startTime: startTime,
+        classNumber: classNum,
+        notes: notes,
+        status: 'scheduled',
+        attendedMembers: [],
+        endTime: null,
+        attendedCount: 0
+      };
+      
+      var arr = gSessions();
+      arr.push(newSession);
+      sSessions(arr);
+      
+      closeCreateSessionModal();
+      if (ss) rAttendance(ss);
+    });
+
+    function openAttendanceModal(session) {
+      document.getElementById('att-session-id').value = session.id;
+      document.getElementById('att-end-time').value = '';
+      
+      var infoDiv = document.getElementById('att-session-info');
+      infoDiv.innerHTML = '<strong>Topic:</strong> ' + esc(session.topic) + '<br>' +
+                          '📅 <strong>Date:</strong> ' + esc(session.date) + ' &middot; 📍 ' + esc(session.venue) + '<br>' +
+                          '👤 <strong>Ustadh:</strong> ' + esc(session.ustadh) + ' &middot; 🏠 <strong>Unit:</strong> ' + esc(session.unit);
+      
+      var regs = gR().filter(function(r) { return nm(r.unit) === nm(session.unit); });
+      
+      var checklistWrapper = document.getElementById('att-checklist-wrapper');
+      var manualWrapper = document.getElementById('att-manual-wrapper');
+      var checklistDiv = document.getElementById('att-member-checklist');
+      
+      if (regs.length > 0) {
+        checklistWrapper.style.display = 'block';
+        manualWrapper.style.display = 'none';
+        
+        checklistDiv.innerHTML = regs.map(function(r) {
+          return '<div class="member-checklist-row" onclick="toggleChecklistCheckbox(this, \'' + r.id + '\')">' +
+                 '  <div class="checklist-cb" data-member-id="' + r.id + '"></div>' +
+                 '  <div>' +
+                 '    <div style="font-weight:600; color:var(--text);">' + esc(r.name) + '</div>' +
+                 '    <div class="tm" style="margin-top:2px;">WhatsApp: ' + esc(r.whatsapp) + '</div>' +
+                 '  </div>' +
+                 '</div>';
+        }).join('');
+      } else {
+        checklistWrapper.style.display = 'none';
+        manualWrapper.style.display = 'block';
+        document.getElementById('att-manual-msg').textContent = 'No registered members found for Unit "' + session.unit + '". You can still save attendance count manually.';
+        document.getElementById('att-manual-count').value = '';
+      }
+      
+      document.querySelector('#attendance-modal h2').textContent = 'Mark Class Attendance';
+      document.getElementById('att-end-time').disabled = false;
+      document.getElementById('att-manual-count').disabled = false;
+      document.querySelector('#attendance-modal button[type="submit"]').style.display = 'block';
+      
+      document.getElementById('attendance-modal').classList.add('on');
+    }
+    window.openAttendanceModal = openAttendanceModal;
+
+    function toggleChecklistCheckbox(rowEl, id) {
+      var cb = rowEl.querySelector('.checklist-cb');
+      if (!cb || cb.classList.contains('disabled')) return;
+      cb.classList.toggle('checked');
+    }
+    window.toggleChecklistCheckbox = toggleChecklistCheckbox;
+
+    function closeAttendanceModal() {
+      document.getElementById('attendance-modal').classList.remove('on');
+    }
+    window.closeAttendanceModal = closeAttendanceModal;
+
+    document.getElementById('afm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var id = document.getElementById('att-session-id').value;
+      var endTime = document.getElementById('att-end-time').value;
+      
+      if (!endTime) {
+        alert('Please enter the class end time.');
+        return;
+      }
+      
+      var arr = gSessions();
+      var s = arr.find(function(item) { return String(item.id) === String(id); });
+      if (!s) return;
+      
+      var checklistWrapper = document.getElementById('att-checklist-wrapper');
+      var attendedIds = [];
+      var attendedCount = 0;
+      
+      if (checklistWrapper.style.display !== 'none') {
+        var cbs = checklistWrapper.querySelectorAll('.checklist-cb.checked');
+        cbs.forEach(function(cb) {
+          attendedIds.push(cb.getAttribute('data-member-id'));
+        });
+        attendedCount = attendedIds.length;
+      } else {
+        var manualVal = document.getElementById('att-manual-count').value;
+        if (manualVal === '' || isNaN(manualVal) || parseInt(manualVal) < 0) {
+          alert('Please enter a valid attendance count.');
+          return;
+        }
+        attendedCount = parseInt(manualVal);
+      }
+      
+      s.status = 'completed';
+      s.endTime = endTime;
+      s.attendedMembers = attendedIds;
+      s.attendedCount = attendedCount;
+      
+      sSessions(arr);
+      closeAttendanceModal();
+      
+      var ss = gSs();
+      if (ss) rAttendance(ss);
+    });
+
+    function openViewAttendanceModal(session) {
+      openAttendanceModal(session);
+      
+      document.querySelector('#attendance-modal h2').textContent = 'View Class Attendance';
+      var endTimeInput = document.getElementById('att-end-time');
+      endTimeInput.value = session.endTime || '';
+      endTimeInput.disabled = true;
+      
+      var checklistWrapper = document.getElementById('att-checklist-wrapper');
+      var manualWrapper = document.getElementById('att-manual-wrapper');
+      
+      if (checklistWrapper.style.display !== 'none') {
+        var rows = checklistWrapper.querySelectorAll('.member-checklist-row');
+        rows.forEach(function(row) {
+          var cb = row.querySelector('.checklist-cb');
+          var mId = cb.getAttribute('data-member-id');
+          if (session.attendedMembers && session.attendedMembers.indexOf(mId) !== -1) {
+            cb.classList.add('checked');
+          } else {
+            cb.classList.remove('checked');
+          }
+          cb.classList.add('disabled');
+        });
+      } else {
+        var manualCount = document.getElementById('att-manual-count');
+        manualCount.value = session.attendedCount || 0;
+        manualCount.disabled = true;
+      }
+      
+      document.querySelector('#attendance-modal button[type="submit"]').style.display = 'none';
+    }
+    window.openViewAttendanceModal = openViewAttendanceModal;
+
     window.closeSuccessModal = function() {
       document.getElementById('success-modal').classList.remove('on');
     };
     function sBnr(t, m) { var b = document.getElementById('fbnr'); b.className = 'bnr ' + t; b.textContent = m; }
-    function hBnr() { var b = document.getElementById('fbnr'); b.className = 'bnr'; b.textContent = ''; } 
+    // Trigger home rendering if logged in initially
+    window.addEventListener('DOMContentLoaded', function() {
+      var ss = gSs();
+      if (ss) {
+        sView('home');
+        rHome(ss);
+      }
+    }); 
   </script>
 </body>
 
