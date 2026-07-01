@@ -854,8 +854,9 @@
       letter-spacing: 0.3px;
     }
     .status-badge.scheduled {
-      background: var(--abg);
-      color: var(--amber);
+      background: var(--rbg);
+      color: var(--red);
+      border: 0.5px solid #fca5a5;
     }
     .status-badge.completed {
       background: var(--gbg);
@@ -1434,7 +1435,6 @@
             <select id="sa-filter-unit" class="fsel" onchange="renderSectorAttendance()">
               <option value="">All Units</option>
             </select>
-            <button class="bsm bex" style="background: var(--green); color: #fff; border-color: var(--green);" onclick="openCreateSessionModal()">+ Create Session</button>
           </div>
         </div>
         
@@ -1486,12 +1486,11 @@
             <select id="ada-filter-unit" class="fsel" onchange="renderAdminAttendance()">
               <option value="">All Units</option>
             </select>
-            <button class="bsm bex" style="background: var(--green); color: #fff; border-color: var(--green);" onclick="openCreateSessionModal()">+ Create Session</button>
           </div>
         </div>
         
         <div id="admin-sessions-grid" class="session-grid"></div>
-        <div id="admin-sessions-empty" class="ec" style="padding: 40px 0;">No sessions created yet. Click + Create Session to begin.</div>
+        <div id="admin-sessions-empty" class="ec" style="padding: 40px 0;">No sessions created yet.</div>
       </div>
     </div>
 
@@ -2453,12 +2452,16 @@
       grid.style.display = 'grid';
       empty.style.display = 'none';
       
-      var disp = sessions.slice().reverse();
-      grid.innerHTML = disp.map(function(s) {
+      var sorted = sessions.slice().sort(function(a, b) {
+        var dtA = new Date(a.date + 'T' + (a.startTime || '00:00'));
+        var dtB = new Date(b.date + 'T' + (b.startTime || '00:00'));
+        return dtB - dtA;
+      });
+      grid.innerHTML = sorted.map(function(s) {
         var isScheduled = s.status === 'scheduled';
         var actionBtnText = isScheduled ? 'Mark Attendance' : 'View';
         var statusClass = isScheduled ? 'scheduled' : 'completed';
-        var statusLabel = isScheduled ? 'Scheduled' : 'Completed';
+        var statusLabel = isScheduled ? 'Not Conducted' : 'Completed';
         
         var countLabel = '';
         if (!isScheduled) {
