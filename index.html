@@ -2494,13 +2494,17 @@
       empty.style.display = 'none';
       
       var sorted = sessions.slice().sort(function(a, b) {
+        var numA = parseInt(a.classNumber) || 0;
+        var numB = parseInt(b.classNumber) || 0;
+        if (numB !== numA) return numB - numA;
         var dtA = new Date(a.date + 'T' + (a.startTime || '00:00'));
         var dtB = new Date(b.date + 'T' + (b.startTime || '00:00'));
         return dtB - dtA;
       });
-      grid.innerHTML = sorted.map(function(s) {
+      grid.innerHTML = sorted.map(function(s, idx) {
         var isScheduled = s.status === 'scheduled';
         var actionBtnText = isScheduled ? 'Mark Attendance' : 'View';
+        var isLatest = idx === 0;
         
         var statusClass = 'completed';
         var statusLabel = 'Completed';
@@ -2525,28 +2529,34 @@
         
         var timeMeta = s.startTime;
         if (s.endTime) timeMeta += ' - ' + s.endTime;
+
+        var topStyle = isLatest ? ' style="border: 2px solid #f59e0b; background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);"' : '';
+        var latestBadge = isLatest ? '<span style="background:#f59e0b;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:0.5px;margin-left:6px;vertical-align:middle;">LATEST</span>' : '';
         
-        return '<div class="session-card">' +
+        return '<div class="session-card"' + topStyle + '>' +
                '  <div>' +
                '    <div class="session-header">' +
-               '      <div class="session-topic">' + esc(s.topic) + '</div>' +
+               '      <div class="session-topic">' + esc(s.topic) + latestBadge + '</div>' +
                '      <span class="status-badge ' + statusClass + '">' + statusLabel + '</span>' +
                '    </div>' +
                '    <div class="session-meta">' +
-               '      <div>📅 <strong>' + esc(s.date) + '</strong> &middot; 📍 ' + esc(s.venue) + '</div>' +
-               '      <div style="margin-top: 4px;">👤 Ustadh: ' + esc(s.ustadh) + ' &middot; 🕒 ' + esc(timeMeta) + '</div>' +
-               '      <div style="margin-top: 4px; font-weight: 600;">📖 Class number ' + (s.classNumber || '—') + ' of 30</div>' +
+               '      <div>📅 <strong>Class ' + (s.classNumber || '—') + ' of 30</strong> &middot; 📍 ' + esc(s.venue) + '</div>' +
+               '      <div style="margin-top: 4px;">📆 ' + esc(s.date) + ' &middot; 🕒 ' + esc(timeMeta) + '</div>' +
+               '      <div style="margin-top: 4px;">👤 Ustadh: ' + esc(s.ustadh) + ' &middot; 🏠 ' + esc(s.unit) + '</div>' +
                '      ' + countLabel +
                '    </div>' +
                '    <div class="session-badges">' +
-               '      <span class="badge badge-unit">' + esc(s.unit) +                 '  <div class="session-actions">' +
-                '    <button class="bsm bex" style="font-weight:700;" onclick="handleSessionAction(\'' + s.id + '\')">' + actionBtnText + '</button>' +
-                '    <div style="display: flex; gap: 10px; align-items: center;">' +
-                '      <span style="font-size:18px; cursor:pointer; color:var(--accent);" onclick="openEditSessionModal(\'' + s.id + '\')">✏️</span>' +
-                '      <span style="font-size:18px; cursor:pointer; color:var(--red);" onclick="deleteSession(\'' + s.id + '\')">🗑️</span>' +
-                '    </div>' +
-                '  </div>' +
-                '</div>';
+               '      <span class="badge badge-unit">' + esc(s.unit) + '</span>' +
+               '    </div>' +
+               '  </div>' +
+               '  <div class="session-actions">' +
+               '    <button class="bsm bex" style="font-weight:700;" onclick="handleSessionAction(\'' + s.id + '\')">' + actionBtnText + '</button>' +
+               '    <div style="display: flex; gap: 10px; align-items: center;">' +
+               '      <span style="font-size:18px; cursor:pointer; color:var(--accent);" onclick="openEditSessionModal(\'' + s.id + '\')">✏️</span>' +
+               '      <span style="font-size:18px; cursor:pointer; color:var(--red);" onclick="deleteSession(\'' + s.id + '\')">🗑️</span>' +
+               '    </div>' +
+               '  </div>' +
+               '</div>';
       }).join('');
     }
 
