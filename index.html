@@ -858,6 +858,11 @@
       color: var(--red);
       border: 0.5px solid #fca5a5;
     }
+    .status-badge.future {
+      background: var(--abg);
+      color: var(--amber);
+      border: 0.5px solid #fcd34d;
+    }
     .status-badge.completed {
       background: var(--gbg);
       color: var(--green);
@@ -1714,18 +1719,53 @@
       var u = ss ? ss.u : '';
       var p = ss ? ss.p : '';
       if (!u || !p) { if (cb) cb(); return; }
-      var url = SCRIPT_URL + (SCRIPT_URL.indexOf('?') === -1 ? '?' : '&') + 'u=' + encodeURIComponent(u) + '&p=' + encodeURIComponent(p) + '&_t=' + Date.now();
-      fetch(url)
-        .then(function (r) { return r.json(); })
-        .then(function (d) { 
-          if (Array.isArray(d)) {
-            sR(d); 
-          } else if (d && d.status === 'error') {
-            console.error("Auth error during sync:", d.message);
-          }
-          if (cb) cb(); 
-        })
-        .catch(function (e) { console.error(e); if (cb) cb(); });
+      
+      var baseParam = (SCRIPT_URL.indexOf('?') === -1 ? '?' : '&') + 'u=' + encodeURIComponent(u) + '&p=' + encodeURIComponent(p) + '&_t=' + Date.now();
+      var urlRegs = SCRIPT_URL + baseParam;
+      var urlSessions = SCRIPT_URL + baseParam + '&type=sessions';
+      
+      Promise.all([
+        fetch(urlRegs).then(function (r) { return r.json(); }),
+        fetch(urlSessions).then(function (r) { return r.json(); })
+      ]).then(function (results) {
+        var regs = results[0];
+        var sessions = results[1];
+        
+        if (Array.isArray(regs)) {
+          sR(regs);
+        }
+        if (Array.isArray(sessions)) {
+          sessions.forEach(function (s) {
+            s.id = s.id;
+            s.topic = s.topic;
+            s.date = s.date;
+            s.unit = s.unit;
+            s.sector = s.sector;
+            s.venue = s.venue;
+            s.ustadh = s.ustadh;
+            s.startTime = s.starttime;
+            s.classNumber = s.classnumber;
+            s.notes = s.notes;
+            s.status = s.status;
+            s.endTime = s.endtime;
+            s.attendedCount = parseInt(s.attendedcount || 0);
+            
+            if (typeof s.attendedmembers === 'string') {
+              try { s.attendedMembers = JSON.parse(s.attendedmembers); }
+              catch(e) { s.attendedMembers = []; }
+            } else if (Array.isArray(s.attendedmembers)) {
+              s.attendedMembers = s.attendedmembers;
+            } else {
+              s.attendedMembers = [];
+            }
+          });
+          sSessions(sessions);
+        }
+        if (cb) cb();
+      }).catch(function (e) {
+        console.error("Sync error:", e);
+        if (cb) cb();
+      });
     }
 
     function sTab(t) {
@@ -2460,8 +2500,22 @@
       grid.innerHTML = sorted.map(function(s) {
         var isScheduled = s.status === 'scheduled';
         var actionBtnText = isScheduled ? 'Mark Attendance' : 'View';
-        var statusClass = isScheduled ? 'scheduled' : 'completed';
-        var statusLabel = isScheduled ? 'Not Conducted' : 'Completed';
+        
+        var statusClass = 'completed';
+        var statusLabel = 'Completed';
+        
+        if (isScheduled) {
+          var schedDt = new Date(s.date + 'T' + (s.startTime || '00:00'));
+          var gracePeriodDt = new Date(schedDt.getTime() + 60 * 60 * 1000);
+          var now = new Date();
+          if (now > gracePeriodDt) {
+            statusClass = 'scheduled';
+            statusLabel = 'Not Conducted';
+          } else {
+            statusClass = 'future';
+            statusLabel = 'Scheduled';
+          }
+        }
         
         var countLabel = '';
         if (!isScheduled) {
@@ -2497,13 +2551,32 @@
 
     function deleteSession(id) {
       if (!confirm('Are you sure you want to delete this session?')) return;
+      var ss = gSs();
+      var u = ss ? ss.u : '';
+      var p = ss ? ss.p : '';
+      
       var arr = gSessions();
       var index = arr.findIndex(function(s) { return String(s.id) === String(id); });
       if (index !== -1) {
         arr.splice(index, 1);
         sSessions(arr);
-        var ss = gSs();
         if (ss) rAttendance(ss);
+      }
+      
+      if (SCRIPT_URL && u && p) {
+        fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'delete_session',
+            u: u,
+            p: p,
+            id: id
+          })
+        }).then(function(r) { return r.json(); })
+          .then(function(res) {
+            console.log("Deleted session from Sheet:", res);
+            syncData(function() { if (ss) rAttendance(ss); });
+          }).catch(console.error);
       }
     }
     window.deleteSession = deleteSession;
@@ -2644,8 +2717,25 @@
         return;
       }
       
-      var arr = gSessions();
+      var targetId = id ? parseInt(id) : Date.now();
+      var sessionData = {
+        action: id ? 'update_session' : 'add_session',
+        u: ss ? ss.u : '',
+        p: ss ? ss.p : '',
+        id: targetId,
+        topic: topic,
+        date: date,
+        unit: unitClean,
+        sector: sectorVal,
+        venue: venue,
+        ustadh: ustadh,
+        startTime: startTime,
+        classNumber: classNum,
+        notes: notes,
+        status: id ? undefined : 'scheduled'
+      };
       
+      var arr = gSessions();
       if (id) {
         var s = arr.find(function(item) { return String(item.id) === String(id); });
         if (s) {
@@ -2661,7 +2751,7 @@
         }
       } else {
         var newSession = {
-          id: Date.now(),
+          id: targetId,
           topic: topic,
           date: date,
           unit: unitClean,
@@ -2682,6 +2772,17 @@
       sSessions(arr);
       closeCreateSessionModal();
       if (ss) rAttendance(ss);
+      
+      if (SCRIPT_URL) {
+        fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify(sessionData)
+        }).then(function(r) { return r.json(); })
+          .then(function(res) {
+            console.log("Saved session to Google Sheet:", res);
+            syncData(function() { if (ss) rAttendance(ss); });
+          }).catch(console.error);
+      }
     });
 
     function openAttendanceModal(session) {
@@ -2794,6 +2895,27 @@
       
       var ss = gSs();
       if (ss) rAttendance(ss);
+      
+      if (SCRIPT_URL) {
+        var sessionData = {
+          action: 'update_session_attendance',
+          u: ss ? ss.u : '',
+          p: ss ? ss.p : '',
+          id: s.id,
+          status: 'completed',
+          endTime: endTime,
+          attendedMembers: JSON.stringify(attendedIds),
+          attendedCount: attendedCount
+        };
+        fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify(sessionData)
+        }).then(function(r) { return r.json(); })
+          .then(function(res) {
+            console.log("Saved session attendance to Sheet:", res);
+            syncData(function() { if (ss) rAttendance(ss); });
+          }).catch(console.error);
+      }
     });
 
     function openViewAttendanceModal(session) {
