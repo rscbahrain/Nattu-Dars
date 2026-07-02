@@ -2126,13 +2126,17 @@
       uSel.innerHTML = '<option value="">Choose Sector first...</option>';
       uSel.disabled = true;
       if (SCRIPT_URL) {
-        fetch(SCRIPT_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(entry)
-        }).catch(function (err) { console.error(err); });
-      }
+          var regUrl = SCRIPT_URL + (SCRIPT_URL.indexOf('?') === -1 ? '?' : '&') +
+            'action=add_reg' +
+            '&name=' + encodeURIComponent(entry.name) +
+            '&mobile=' + encodeURIComponent(entry.mobile) +
+            '&whatsapp=' + encodeURIComponent(entry.whatsapp) +
+            '&sector=' + encodeURIComponent(entry.sector) +
+            '&unit=' + encodeURIComponent(entry.unit) +
+            '&date=' + encodeURIComponent(entry.date) +
+            '&_t=' + Date.now();
+          fetch(regUrl).catch(function (err) { console.error(err); });
+        }
       setTimeout(hBnr, 3000);
     });
     window.editReg = function (id) {
