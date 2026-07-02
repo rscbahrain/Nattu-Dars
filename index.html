@@ -2179,17 +2179,15 @@
         sR(regs);
         if (SCRIPT_URL) {
           var ss = gSs();
-          fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              action: 'delete',
-              id: id,
-              u: ss ? ss.u : '',
-              p: ss ? ss.p : ''
-            })
-          }).catch(function (err) { console.error(err); });
+          var delUrl = SCRIPT_URL + (SCRIPT_URL.indexOf('?') === -1 ? '?' : '&') +
+            'action=delete_reg' +
+            '&u=' + encodeURIComponent(ss ? ss.u : '') +
+            '&p=' + encodeURIComponent(ss ? ss.p : '') +
+            '&id=' + encodeURIComponent(id) +
+            '&_t=' + Date.now();
+          fetch(delUrl)
+            .then(function() { syncData(function() { var s = gSs(); if (s) rRole(s); }); })
+            .catch(function (err) { console.error(err); });
         }
       }
       var ss = gSs();
@@ -2229,22 +2227,20 @@
         sR(regs);
         if (SCRIPT_URL) {
           var ss = gSs();
-          fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              action: 'update',
-              id: id,
-              name: name,
-              mobile: mob,
-              whatsapp: wa,
-              sector: sec,
-              unit: un,
-              u: ss ? ss.u : '',
-              p: ss ? ss.p : ''
-            })
-          }).catch(function (err) { console.error(err); });
+          var updUrl = SCRIPT_URL + (SCRIPT_URL.indexOf('?') === -1 ? '?' : '&') +
+            'action=update_reg' +
+            '&u=' + encodeURIComponent(ss ? ss.u : '') +
+            '&p=' + encodeURIComponent(ss ? ss.p : '') +
+            '&id=' + encodeURIComponent(id) +
+            '&name=' + encodeURIComponent(name) +
+            '&mobile=' + encodeURIComponent(mob) +
+            '&whatsapp=' + encodeURIComponent(wa) +
+            '&sector=' + encodeURIComponent(sec) +
+            '&unit=' + encodeURIComponent(un) +
+            '&_t=' + Date.now();
+          fetch(updUrl)
+            .then(function() { syncData(function() { var s = gSs(); if (s) rRole(s); }); })
+            .catch(function (err) { console.error(err); });
         }
       }
       closeEditModal();
