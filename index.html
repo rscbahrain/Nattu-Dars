@@ -1762,6 +1762,69 @@
     function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
     function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
     function nm(s) { return String(s || '').toUpperCase().trim(); }
+    
+    function fmtDate(dStr) {
+      if (!dStr) return '';
+      dStr = String(dStr).trim();
+      if (/^\d{2}-\d{2}-\d{4}$/.test(dStr)) return dStr;
+      if (/^\d{2}\/\d{2}\/\d{4}$/.test(dStr)) return dStr.replace(/\//g, '-');
+      var parts = dStr.split('-');
+      if (parts.length === 3 && parts[0].length === 4) {
+        return parts[2] + '-' + parts[1] + '-' + parts[0];
+      }
+      if (dStr.indexOf('T') !== -1) {
+        var datePart = dStr.split('T')[0];
+        var p = datePart.split('-');
+        if (p.length === 3 && p[0].length === 4) {
+          return p[2] + '-' + p[1] + '-' + p[0];
+        }
+      }
+      var d = new Date(dStr);
+      if (isNaN(d.getTime())) return dStr;
+      var dd = String(d.getDate()).padStart(2, '0');
+      var mm = String(d.getMonth() + 1).padStart(2, '0');
+      var yyyy = d.getFullYear();
+      return dd + '-' + mm + '-' + yyyy;
+    }
+    window.fmtDate = fmtDate;
+
+    function fmtTime(tStr) {
+      if (!tStr) return '';
+      tStr = String(tStr).trim();
+      if (/^\d{2}\.\d{2}\s*(AM|PM)$/i.test(tStr)) return tStr.toUpperCase();
+      if (tStr.indexOf('T') !== -1 && tStr.indexOf(':') !== -1) {
+        var timePart = tStr.split('T')[1];
+        if (timePart) {
+          var p = timePart.split(':');
+          if (p.length >= 2) {
+            var h = parseInt(p[0], 10);
+            var m = parseInt(p[1], 10);
+            var ampm = h >= 12 ? 'PM' : 'AM';
+            h = h % 12;
+            if (h === 0) h = 12;
+            var hh = String(h).padStart(2, '0');
+            var mm = String(m).padStart(2, '0');
+            return hh + '.' + mm + ' ' + ampm;
+          }
+        }
+      }
+      var parts = tStr.split(':');
+      if (parts.length >= 2) {
+        var h = parseInt(parts[0], 10);
+        var m = parseInt(parts[1], 10);
+        if (!isNaN(h) && !isNaN(m)) {
+          var ampm = h >= 12 ? 'PM' : 'AM';
+          h = h % 12;
+          if (h === 0) h = 12;
+          var hh = String(h).padStart(2, '0');
+          var mm = String(m).padStart(2, '0');
+          return hh + '.' + mm + ' ' + ampm;
+        }
+      }
+      return tStr;
+    }
+    window.fmtTime = fmtTime;
+
     function gSs() { try { return JSON.parse(safeSessionStorage.getItem(SS)) || null; } catch (e) { return null; } }
     function sSs(o) { try { safeSessionStorage.setItem(SS, JSON.stringify(o)); } catch (e) {} }
     function cSs() { try { safeSessionStorage.removeItem(SS); } catch (e) {} }
@@ -1952,14 +2015,14 @@
       var sR2 = regs.filter(function (r) { return nm(r.sector) === nm(sn); });
       document.getElementById('us1').textContent = myR.length;
       document.getElementById('us2').textContent = sR2.length;
-      var dy = {}; myR.forEach(function (r) { if (r.date) dy[r.date] = (dy[r.date] || 0) + 1; });
-      var dts = Object.keys(dy).sort(function (a, b) { var pa = a.split('/'), pb = b.split('/'); return new Date(pa[2], pa[1] - 1, pa[0]) - new Date(pb[2], pb[1] - 1, pb[0]); });
+      var dy = {}; myR.forEach(function (r) { var fd = fmtDate(r.date); if (fd) dy[fd] = (dy[fd] || 0) + 1; });
+      var dts = Object.keys(dy).sort(function (a, b) { var pa = a.split('-'), pb = b.split('-'); return new Date(pa[2], pa[1] - 1, pa[0]) - new Date(pb[2], pb[1] - 1, pb[0]); });
       var c2 = document.getElementById('uch2');
       if (!dts.length) { c2.innerHTML = '<div class="ec">No trend data yet.</div>'; }
       else { var mx2 = Math.max.apply(null, dts.map(function (d) { return dy[d]; })) || 1; c2.innerHTML = dts.map(function (d) { var cnt = dy[d], pct = (cnt / mx2 * 100).toFixed(1); return '<div class="br"><div class="bl" style="width:90px">' + esc(d) + '</div><div class="bt"><div class="bf" style="width:' + pct + '%"></div></div><div class="bc">' + cnt + '</div></div>'; }).join(''); }
       var tb = document.getElementById('utb'), dp = myR.slice().reverse();
       if (!dp.length) { tb.innerHTML = '<tr><td colspan="6" class="et">No registrations for this unit yet.</td></tr>'; }
-      else { tb.innerHTML = dp.map(function (r, i) { return '<tr><td class="ic tm">' + (i + 1) + '</td><td>' + esc(r.name) + '</td><td class="tm">' + (esc(r.mobile) || '—') + '</td><td>' + esc(r.whatsapp) + '</td><td class="tm">' + esc(r.date) + '</td><td style="text-align:right;white-space:nowrap;"><button class="bsm bex" style="margin-right:4px;" onclick="editReg(\'' + r.id + '\')">Edit</button><button class="bsm bdn" onclick="deleteReg(\'' + r.id + '\')">Delete</button></td></tr>'; }).join(''); }
+      else { tb.innerHTML = dp.map(function (r, i) { return '<tr><td class="ic tm">' + (i + 1) + '</td><td>' + esc(r.name) + '</td><td class="tm">' + (esc(r.mobile) || '—') + '</td><td>' + esc(r.whatsapp) + '</td><td class="tm">' + fmtDate(r.date) + '</td><td style="text-align:right;white-space:nowrap;"><button class="bsm bex" style="margin-right:4px;" onclick="editReg(\'' + r.id + '\')">Edit</button><button class="bsm bdn" onclick="deleteReg(\'' + r.id + '\')">Delete</button></td></tr>'; }).join(''); }
     }
 
     var _ss2 = null;
@@ -1991,7 +2054,7 @@
       if (fu) sRgs = sRgs.filter(function (r) { return nm(r.unit) === nm(fu); });
       var dp = sRgs.slice().reverse(), tb = document.getElementById('stb');
       if (!dp.length) { tb.innerHTML = '<tr><td colspan="6" class="et">No registrations' + (fu ? ' for ' + esc(fu) : '') + ' yet.</td></tr>'; return; }
-      tb.innerHTML = dp.map(function (r, i) { return '<tr><td class="ic tm">' + (i + 1) + '</td><td>' + esc(r.name) + '</td><td class="tm">' + (esc(r.mobile) || '—') + '</td><td>' + esc(r.whatsapp) + '</td><td><span class="pill">' + esc(r.unit || '—') + '</span></td><td class="tm">' + esc(r.date) + '</td></tr>'; }).join('');
+      tb.innerHTML = dp.map(function (r, i) { return '<tr><td class="ic tm">' + (i + 1) + '</td><td>' + esc(r.name) + '</td><td class="tm">' + (esc(r.mobile) || '—') + '</td><td>' + esc(r.whatsapp) + '</td><td><span class="pill">' + esc(r.unit || '—') + '</span></td><td class="tm">' + fmtDate(r.date) + '</td></tr>'; }).join('');
     }
 
     function rAdm() {
@@ -2014,7 +2077,7 @@
       var tb = document.getElementById('atb');
       if (!regs.length) { tb.innerHTML = '<tr><td colspan="8" class="et">No registrations found.</td></tr>'; return; }
       var dp = regs.slice().reverse();
-      tb.innerHTML = dp.map(function (r, i) { return '<tr><td class="ic tm">' + (i + 1) + '</td><td>' + esc(r.name) + '</td><td class="tm">' + (esc(r.mobile) || '—') + '</td><td>' + esc(r.whatsapp) + '</td><td>' + (r.sector ? '<span class="pill">' + esc(r.sector) + '</span>' : '<span class="tm">—</span>') + '</td><td class="tm">' + (esc(r.unit) || '—') + '</td><td class="tm">' + esc(r.date) + '</td><td style="text-align:right;white-space:nowrap;"><button class="bsm bex" style="margin-right:4px;" onclick="editReg(\'' + r.id + '\')">Edit</button><button class="bsm bdn" onclick="deleteReg(\'' + r.id + '\')">Delete</button></td></tr>'; }).join('');
+      tb.innerHTML = dp.map(function (r, i) { return '<tr><td class="ic tm">' + (i + 1) + '</td><td>' + esc(r.name) + '</td><td class="tm">' + (esc(r.mobile) || '—') + '</td><td>' + esc(r.whatsapp) + '</td><td>' + (r.sector ? '<span class="pill">' + esc(r.sector) + '</span>' : '<span class="tm">—</span>') + '</td><td class="tm">' + (esc(r.unit) || '—') + '</td><td class="tm">' + fmtDate(r.date) + '</td><td style="text-align:right;white-space:nowrap;"><button class="bsm bex" style="margin-right:4px;" onclick="editReg(\'' + r.id + '\')">Edit</button><button class="bsm bdn" onclick="deleteReg(\'' + r.id + '\')">Delete</button></td></tr>'; }).join('');
     }
     window.onAdminSectorChange = function() {
       var sec = document.getElementById('ad-filter-sector').value;
@@ -2059,7 +2122,7 @@
       var regs = gR().filter(function(r) { return nm(r.unit) === nm(ss.unit); });
       if (!regs.length) { alert('No registrations to export.'); return; }
       var hdrs = ['#', 'Name', 'Mobile', 'WhatsApp', 'Date'];
-      var rows = regs.map(function(r, i) { return [i + 1, r.name, r.mobile, r.whatsapp, r.date]; });
+      var rows = regs.map(function(r, i) { return [i + 1, r.name, r.mobile, r.whatsapp, fmtDate(r.date)]; });
       downloadCSV('registrations_' + ss.unit.toLowerCase().replace(/ /g, '_') + '.csv', hdrs, rows);
     };
     window.expSecCSV = function() {
@@ -2070,7 +2133,7 @@
       if (fu) regs = regs.filter(function(r) { return nm(r.unit) === nm(fu); });
       if (!regs.length) { alert('No registrations to export.'); return; }
       var hdrs = ['#', 'Name', 'Mobile', 'WhatsApp', 'Unit', 'Date'];
-      var rows = regs.map(function(r, i) { return [i + 1, r.name, r.mobile, r.whatsapp, r.unit, r.date]; });
+      var rows = regs.map(function(r, i) { return [i + 1, r.name, r.mobile, r.whatsapp, r.unit, fmtDate(r.date)]; });
       var fn = 'registrations_' + ss.sector.toLowerCase().replace(/ /g, '_') + (fu ? '_' + fu.toLowerCase().replace(/ /g, '_') : '') + '.csv';
       downloadCSV(fn, hdrs, rows);
     };
@@ -2082,14 +2145,14 @@
       if (un) regs = regs.filter(function(r) { return nm(r.unit) === nm(un); });
       if (!regs.length) { alert('No registrations to export.'); return; }
       var hdrs = ['#', 'Name', 'Mobile', 'WhatsApp', 'Sector', 'Unit', 'Date'];
-      var rows = regs.map(function(r, i) { return [i + 1, r.name, r.mobile, r.whatsapp, r.sector, r.unit, r.date]; });
+      var rows = regs.map(function(r, i) { return [i + 1, r.name, r.mobile, r.whatsapp, r.sector, r.unit, fmtDate(r.date)]; });
       downloadCSV('registrations_filtered.csv', hdrs, rows);
     };
     window.expAdmAllCSV = function() {
       var regs = gR();
       if (!regs.length) { alert('No registrations to export.'); return; }
       var hdrs = ['#', 'Name', 'Mobile', 'WhatsApp', 'Sector', 'Unit', 'Date'];
-      var rows = regs.map(function(r, i) { return [i + 1, r.name, r.mobile, r.whatsapp, r.sector, r.unit, r.date]; });
+      var rows = regs.map(function(r, i) { return [i + 1, r.name, r.mobile, r.whatsapp, r.sector, r.unit, fmtDate(r.date)]; });
       downloadCSV('registrations_all.csv', hdrs, rows);
     }
     function clrAll() {
@@ -2179,7 +2242,7 @@
         ok = false;
       }
       if (!ok) return;
-      var entry = { id: uid(), name: name, mobile: mob, whatsapp: wa, sector: sec, unit: un, date: new Date().toLocaleDateString('en-GB') };
+      var entry = { id: uid(), name: name, mobile: mob, whatsapp: wa, sector: sec, unit: un, date: new Date().toLocaleDateString('en-GB').replace(/\//g, '-') };
       var regs = gR(); regs.push(entry); sR(regs);
       document.getElementById('success-modal').classList.add('on');
       document.getElementById('rfm').reset();
@@ -2329,9 +2392,11 @@
       if (sec === 'dashboard') {
         sView(ss.role);
         rRole(ss);
+        syncData(function() { rRole(ss); });
       } else if (sec === 'attendance') {
         sView(ss.role + '-attendance');
         rAttendance(ss);
+        syncData(function() { rAttendance(ss); });
       }
     }
     window.goSection = goSection;
@@ -2633,8 +2698,8 @@
           countLabel = '<div style="font-size: 13px; font-weight: 700; color: var(--green); margin-top: 8px;">' + (s.attendedCount || 0) + ' attended / ' + totalRegisteredForSession + ' registered</div>';
         }
         
-        var timeMeta = s.startTime;
-        if (s.endTime) timeMeta += ' - ' + s.endTime;
+        var timeMetaFormatted = fmtTime(s.startTime);
+        if (s.endTime) timeMetaFormatted += ' - ' + fmtTime(s.endTime);
 
         var topStyle = isLatest ? ' style="border: 2px solid #f59e0b; background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);"' : '';
         var latestBadge = isLatest ? '<span style="background:#f59e0b;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:0.5px;margin-left:6px;vertical-align:middle;">LATEST</span>' : '';
@@ -2666,7 +2731,7 @@
                '    </div>' +
                '    <div class="session-meta">' +
                '      <div style="display:flex; align-items:center; flex-wrap:wrap; gap:4px 0;">' + iconCal + ' <strong style="margin-right:8px;">Class ' + (s.classNumber || '—') + ' of 30</strong> &middot; &nbsp;' + iconPin + ' ' + esc(s.venue) + '</div>' +
-               '      <div style="margin-top: 4px; display:flex; align-items:center; flex-wrap:wrap; gap:4px 0;">' + iconDate + ' ' + esc(s.date) + ' &middot; &nbsp;' + iconClock + ' ' + esc(timeMeta) + '</div>' +
+               '      <div style="margin-top: 4px; display:flex; align-items:center; flex-wrap:wrap; gap:4px 0;">' + iconDate + ' ' + fmtDate(s.date) + ' &middot; &nbsp;' + iconClock + ' ' + esc(timeMetaFormatted) + '</div>' +
                '      <div style="margin-top: 4px; display:flex; align-items:center; flex-wrap:wrap; gap:4px 0;">' + iconUser + ' Ustadh: ' + esc(s.ustadh) + ' &middot; &nbsp;' + iconHome + ' ' + esc(s.unit) + '</div>' +
                '      ' + countLabel +
                '    </div>' +
@@ -2933,7 +2998,7 @@
       var iconHome = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px; color: var(--t2);"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>';
 
       infoDiv.innerHTML = '<div style="display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px 0;"><strong>Topic:</strong> &nbsp;' + esc(session.topic) + '</div>' +
-                          '<div style="margin-top: 4px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px 0;">' + iconCal + ' <strong>Date:</strong> &nbsp;' + esc(session.date) + ' &middot; &nbsp;' + iconPin + ' ' + esc(session.venue) + '</div>' +
+                          '<div style="margin-top: 4px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px 0;">' + iconCal + ' <strong>Date:</strong> &nbsp;' + fmtDate(session.date) + ' &middot; &nbsp;' + iconPin + ' ' + esc(session.venue) + '</div>' +
                           '<div style="margin-top: 4px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px 0;">' + iconUser + ' <strong>Ustadh:</strong> &nbsp;' + esc(session.ustadh) + ' &middot; &nbsp;' + iconHome + ' <strong>Unit:</strong> &nbsp;' + esc(session.unit) + '</div>';
       
       var regs = [];
@@ -3113,6 +3178,7 @@
       if (ss) {
         sView('home');
         rHome(ss);
+        syncData();
       }
     }); 
   </script>
