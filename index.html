@@ -1765,6 +1765,25 @@
     function gSs() { try { return JSON.parse(safeSessionStorage.getItem(SS)) || null; } catch (e) { return null; } }
     function sSs(o) { try { safeSessionStorage.setItem(SS, JSON.stringify(o)); } catch (e) {} }
     function cSs() { try { safeSessionStorage.removeItem(SS); } catch (e) {} }
+    function processSessions(sessions) {
+      if (!Array.isArray(sessions)) return [];
+      sessions.forEach(function (s) {
+        s.startTime = s.starttime;
+        s.classNumber = s.classnumber;
+        s.endTime = s.endtime;
+        s.attendedCount = parseInt(s.attendedcount || 0);
+        if (typeof s.attendedmembers === 'string') {
+          try { s.attendedMembers = JSON.parse(s.attendedmembers); }
+          catch(e) { s.attendedMembers = []; }
+        } else if (Array.isArray(s.attendedmembers)) {
+          s.attendedMembers = s.attendedmembers;
+        } else {
+          s.attendedMembers = [];
+        }
+      });
+      return sessions;
+    }
+
     function syncData(cb) {
       if (!SCRIPT_URL) { if (cb) cb(); return; }
       var ss = gSs();
@@ -1772,52 +1791,29 @@
       var p = ss ? ss.p : '';
       if (!u || !p) { if (cb) cb(); return; }
       
-      var baseParam = (SCRIPT_URL.indexOf('?') === -1 ? '?' : '&') + 'u=' + encodeURIComponent(u) + '&p=' + encodeURIComponent(p) + '&_sec=' + encodeURIComponent(_xK) + '&_t=' + Date.now();
-      var urlRegs = SCRIPT_URL + baseParam + '&action=regs';
-      var urlSessions = SCRIPT_URL + baseParam + '&action=sessions';
+      var url = SCRIPT_URL + (SCRIPT_URL.indexOf('?') === -1 ? '?' : '&') +
+        'u=' + encodeURIComponent(u) +
+        '&p=' + encodeURIComponent(p) +
+        '&_sec=' + encodeURIComponent(_xK) +
+        '&action=all' +
+        '&_t=' + Date.now();
       
-      Promise.all([
-        fetch(urlRegs).then(function (r) { return r.json(); }),
-        fetch(urlSessions).then(function (r) { return r.json(); })
-      ]).then(function (results) {
-        var regs = results[0];
-        var sessions = results[1];
-        
-        if (Array.isArray(regs)) {
-          sR(regs);
-        }
-        if (Array.isArray(sessions)) {
-          sessions.forEach(function (s) {
-            s.id = s.id;
-            s.topic = s.topic;
-            s.date = s.date;
-            s.unit = s.unit;
-            s.sector = s.sector;
-            s.venue = s.venue;
-            s.ustadh = s.ustadh;
-            s.startTime = s.starttime;
-            s.classNumber = s.classnumber;
-            s.notes = s.notes;
-            s.status = s.status;
-            s.endTime = s.endtime;
-            s.attendedCount = parseInt(s.attendedcount || 0);
-            
-            if (typeof s.attendedmembers === 'string') {
-              try { s.attendedMembers = JSON.parse(s.attendedmembers); }
-              catch(e) { s.attendedMembers = []; }
-            } else if (Array.isArray(s.attendedmembers)) {
-              s.attendedMembers = s.attendedmembers;
-            } else {
-              s.attendedMembers = [];
+      fetch(url)
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (d && d.status === 'ok') {
+            if (Array.isArray(d.regs)) {
+              sR(d.regs);
             }
-          });
-          sSessions(sessions);
-        }
-        if (cb) cb();
-      }).catch(function (e) {
-        console.error("Sync error:", e);
-        if (cb) cb();
-      });
+            if (Array.isArray(d.sessions)) {
+              sSessions(processSessions(d.sessions));
+            }
+          }
+          if (cb) cb();
+        }).catch(function (e) {
+          console.error("Sync error:", e);
+          if (cb) cb();
+        });
     }
 
     function sTab(t) {
@@ -1880,7 +1876,7 @@
         return;
       }
       
-      var url = SCRIPT_URL + (SCRIPT_URL.indexOf('?') === -1 ? '?' : '&') + 'u=' + encodeURIComponent(u) + '&p=' + encodeURIComponent(p) + '&_sec=' + encodeURIComponent(_xK) + '&_t=' + Date.now();
+      var url = SCRIPT_URL + (SCRIPT_URL.indexOf('?') === -1 ? '?' : '&') + 'u=' + encodeURIComponent(u) + '&p=' + encodeURIComponent(p) + '&_sec=' + encodeURIComponent(_xK) + '&action=all&_t=' + Date.now();
       
       err.textContent = 'Verifying...';
       err.hidden = false;
@@ -1893,9 +1889,10 @@
             err.hidden = false;
             return;
           }
-          if (Array.isArray(d)) {
+          if (d && d.status === 'ok' && Array.isArray(d.regs) && Array.isArray(d.sessions)) {
             err.hidden = true;
-            sR(d);
+            sR(d.regs);
+            sSessions(processSessions(d.sessions));
             var ss = { role: role, u: u, p: p };
             if (sector) ss.sector = sector;
             if (unit) ss.unit = unit;
@@ -1903,7 +1900,6 @@
             document.getElementById('lfm').reset();
             sView('home');
             rHome(ss);
-            syncData();
           } else {
             err.textContent = 'Server response error. Please try again.';
             err.hidden = false;
