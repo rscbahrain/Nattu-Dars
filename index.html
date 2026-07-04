@@ -1859,6 +1859,30 @@
     }
     window.fmtTime = fmtTime;
 
+    function getSessionTimestamp(dateStr, timeStr) {
+      if (!dateStr) return 0;
+      var y = '', m = '', d = '';
+      var p = dateStr.split(/[-/]/);
+      if (p.length === 3) {
+        if (p[0].length === 4) {
+          y = p[0]; m = p[1]; d = p[2];
+        } else {
+          y = p[2]; m = p[1]; d = p[0];
+        }
+      }
+      var hh = 0, mm = 0;
+      if (timeStr) {
+        var tp = timeStr.split(':');
+        if (tp.length >= 2) {
+          hh = parseInt(tp[0], 10) || 0;
+          mm = parseInt(tp[1], 10) || 0;
+        }
+      }
+      var dt = new Date(parseInt(y, 10), parseInt(m, 10) - 1, parseInt(d, 10), hh, mm);
+      return dt.getTime();
+    }
+    window.getSessionTimestamp = getSessionTimestamp;
+
     function gSs() { try { return JSON.parse(safeSessionStorage.getItem(SS)) || null; } catch (e) { return null; } }
     function sSs(o) { try { safeSessionStorage.setItem(SS, JSON.stringify(o)); } catch (e) {} }
     function cSs() { try { safeSessionStorage.removeItem(SS); } catch (e) {} }
@@ -1936,7 +1960,7 @@
     document.getElementById('lfm').addEventListener('submit', function (e) {
       e.preventDefault();
       var u = document.getElementById('lu').value.trim().toUpperCase();
-      var p = document.getElementById('lp').value;
+      var p = document.getElementById('lp').value.trim();
       var err = document.getElementById('lerr');
       
       if (!u || !p) {
@@ -1946,22 +1970,26 @@
       }
       
       var role = null, sector = null, unit = null;
+      var cleanU = u;
+      
       if (u === 'ADMIN' || u === 'RSCBAHRAIN') {
         role = 'admin';
       } else if (u.indexOf('SC') === 0) {
-        var secName = u.substring(2);
+        var secName = u.indexOf('SC/') === 0 ? u.substring(3) : u.substring(2);
         if (SU[secName]) {
           role = 'sector';
           sector = secName;
+          cleanU = 'SC/' + secName;
         }
       } else if (u.indexOf('UN') === 0) {
-        var unName = u.substring(2);
+        var unName = u.indexOf('UN/') === 0 ? u.substring(3) : u.substring(2);
         var keys = Object.keys(SU);
         for (var i = 0; i < keys.length; i++) {
           if (SU[keys[i]].indexOf(unName) !== -1) {
             role = 'unit';
             unit = unName;
             sector = keys[i];
+            cleanU = 'UN/' + unName;
             break;
           }
         }
@@ -1972,41 +2000,33 @@
         err.hidden = false;
         return;
       }
+
+      var isValid = false;
+      if (role === 'admin' && p === 'Adim@RSC') {
+        isValid = true;
+      } else if (role === 'sector' && p === sector.toLowerCase() + '@2026') {
+        isValid = true;
+      } else if (role === 'unit' && p === unit.toLowerCase() + '@2026') {
+        isValid = true;
+      }
       
-      var url = SCRIPT_URL + (SCRIPT_URL.indexOf('?') === -1 ? '?' : '&') + 'u=' + encodeURIComponent(u) + '&p=' + encodeURIComponent(p) + '&_sec=' + encodeURIComponent(_xK) + '&action=all&_t=' + Date.now();
+      if (!isValid) {
+        err.textContent = 'Invalid username or password. Please try again.';
+        err.hidden = false;
+        return;
+      }
       
-      err.textContent = 'Verifying...';
-      err.hidden = false;
+      err.hidden = true;
+      var ss = { role: role, u: cleanU, p: p };
+      if (sector) ss.sector = sector;
+      if (unit) ss.unit = unit;
+      sSs(ss);
+      document.getElementById('lfm').reset();
+      sView('home');
+      rHome(ss);
       
-      fetch(url)
-        .then(function (r) { return r.json(); })
-        .then(function (d) {
-          if (d && d.status === 'error') {
-            err.textContent = 'Invalid username or password. Please try again.';
-            err.hidden = false;
-            return;
-          }
-          if (d && d.status === 'ok' && Array.isArray(d.regs) && Array.isArray(d.sessions)) {
-            err.hidden = true;
-            sR(d.regs);
-            sSessions(processSessions(d.sessions));
-            var ss = { role: role, u: u, p: p };
-            if (sector) ss.sector = sector;
-            if (unit) ss.unit = unit;
-            sSs(ss);
-            document.getElementById('lfm').reset();
-            sView('home');
-            rHome(ss);
-          } else {
-            err.textContent = 'Server response error. Please try again.';
-            err.hidden = false;
-          }
-        })
-        .catch(function (e) {
-          console.error(e);
-          err.textContent = 'Connection error. Please verify web app deployment.';
-          err.hidden = false;
-        });
+      // Fetch the latest data in the background
+      syncData();
     });
     function togglePasswordVisibility() {
       var pwInput = document.getElementById('lp');
@@ -2693,9 +2713,9 @@
         var numA = parseInt(a.classNumber) || 0;
         var numB = parseInt(b.classNumber) || 0;
         if (numB !== numA) return numB - numA;
-        var dtA = new Date(a.date + 'T' + (a.startTime || '00:00'));
-        var dtB = new Date(b.date + 'T' + (b.startTime || '00:00'));
-        return dtB - dtA;
+        var tsA = getSessionTimestamp(a.date, a.startTime);
+        var tsB = getSessionTimestamp(b.date, b.startTime);
+        return tsB - tsA;
       });
 
       var ss = gSs();
@@ -2710,10 +2730,10 @@
         var statusLabel = 'Completed';
         
         if (isScheduled) {
-          var schedDt = new Date(s.date + 'T' + (s.startTime || '00:00'));
-          var gracePeriodDt = new Date(schedDt.getTime() + 60 * 60 * 1000);
-          var now = new Date();
-          if (now > gracePeriodDt) {
+          var schedDtMs = getSessionTimestamp(s.date, s.startTime);
+          var gracePeriodMs = schedDtMs + 60 * 60 * 1000;
+          var nowMs = Date.now();
+          if (nowMs > gracePeriodMs) {
             statusClass = 'scheduled';
             statusLabel = 'Not Conducted';
           } else {
