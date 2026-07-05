@@ -1979,7 +1979,7 @@
         if (SU[secName]) {
           role = 'sector';
           sector = secName;
-          cleanU = 'SC/' + secName;
+          cleanU = 'SC' + secName;
         }
       } else if (u.indexOf('UN') === 0) {
         var unName = u.indexOf('UN/') === 0 ? u.substring(3) : u.substring(2);
@@ -1989,7 +1989,7 @@
             role = 'unit';
             unit = unName;
             sector = keys[i];
-            cleanU = 'UN/' + unName;
+            cleanU = 'UN' + unName;
             break;
           }
         }
@@ -2045,17 +2045,18 @@
     window.triggerSync = function () {
       var ss = gSs();
       if (!ss) return;
-      var btnU = document.getElementById('btn-sync-u');
-      var btnS = document.getElementById('btn-sync-s');
-      var btnA = document.getElementById('btn-sync-a');
-      if (btnU) { btnU.disabled = true; btnU.textContent = 'Syncing...'; }
-      if (btnS) { btnS.disabled = true; btnS.textContent = 'Syncing...'; }
-      if (btnA) { btnA.disabled = true; btnA.textContent = 'Syncing...'; }
+      var buttons = ['btn-sync-u', 'btn-sync-s', 'btn-sync-a', 'btn-sync-u-att', 'btn-sync-s-att', 'btn-sync-a-att'];
+      buttons.forEach(function(id) {
+        var btn = document.getElementById(id);
+        if (btn) { btn.disabled = true; btn.textContent = 'Syncing...'; }
+      });
       syncData(function () {
         rRole(ss);
-        if (btnU) { btnU.disabled = false; btnU.textContent = 'Refresh'; }
-        if (btnS) { btnS.disabled = false; btnS.textContent = 'Refresh'; }
-        if (btnA) { btnA.disabled = false; btnA.textContent = 'Refresh'; }
+        rAttendance(ss);
+        buttons.forEach(function(id) {
+          var btn = document.getElementById(id);
+          if (btn) { btn.disabled = false; btn.textContent = 'Refresh'; }
+        });
       });
     };
     function rRole(ss) { if (ss.role === 'unit') rUnit(ss); else if (ss.role === 'sector') rSec(ss); else if (ss.role === 'admin') rAdm(); }
