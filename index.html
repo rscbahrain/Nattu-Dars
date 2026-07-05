@@ -1859,16 +1859,16 @@
       dStr = String(dStr).trim();
       if (/^\d{2}-\d{2}-\d{4}/.test(dStr)) return dStr;
       if (/^\d{2}\/\d{2}\/\d{4}/.test(dStr)) return dStr.replace(/\//g, '-');
-      var parts = dStr.split('-');
-      if (parts.length === 3 && parts[0].length === 4) {
-        return parts[2] + '-' + parts[1] + '-' + parts[0];
-      }
       if (dStr.indexOf('T') !== -1) {
         var datePart = dStr.split('T')[0];
         var p = datePart.split('-');
         if (p.length === 3 && p[0].length === 4) {
-          return p[2] + '-' + p[1] + '-' + p[0];
+          return p[2].padStart(2, '0') + '-' + p[1].padStart(2, '0') + '-' + p[0];
         }
+      }
+      var parts = dStr.split('-');
+      if (parts.length === 3 && parts[0].length === 4) {
+        return parts[2].padStart(2, '0') + '-' + parts[1].padStart(2, '0') + '-' + parts[0];
       }
       var d = new Date(dStr);
       if (isNaN(d.getTime())) return dStr;
@@ -1884,9 +1884,10 @@
       tStr = String(tStr).trim();
       // Already formatted as HH:MM AM/PM
       if (/^\d{1,2}:\d{2}\s*(AM|PM)$/i.test(tStr)) return tStr.toUpperCase();
-      // Legacy dot format HH.MM AM/PM — normalise to colon
-      if (/^\d{2}\.\d{2}\s*(AM|PM)$/i.test(tStr)) {
-        return tStr.replace('.', ':').toUpperCase();
+      // Legacy dot format H.MM AM/PM or HH.MM AM/PM — normalise to colon
+      var dotMatch = tStr.match(/^(\d{1,2})\.(\d{2})\s*(AM|PM)$/i);
+      if (dotMatch) {
+        return String(parseInt(dotMatch[1], 10)).padStart(2, '0') + ':' + dotMatch[2] + ' ' + dotMatch[3].toUpperCase();
       }
       // ISO datetime string e.g. 2026-07-05T08:30:00
       if (tStr.indexOf('T') !== -1 && tStr.indexOf(':') !== -1) {
@@ -3050,6 +3051,9 @@
     function normalizeToYYYYMMDD(dStr) {
       if (!dStr) return '';
       dStr = String(dStr).trim();
+      if (dStr.indexOf('T') !== -1) {
+        dStr = dStr.split('T')[0];
+      }
       if (/^\d{4}-\d{2}-\d{2}$/.test(dStr)) return dStr;
       
       var p = dStr.split(/[-/]/);
