@@ -755,6 +755,75 @@
       }
     }
 
+    /* ── Filter checklist panels ── */
+    .fcrd {
+      background: var(--card);
+      border: var(--b);
+      border-radius: var(--r);
+      padding: 14px 18px;
+      margin-bottom: 8px;
+    }
+    .fcrd-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--mu);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+    .f-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .f-col-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--t2);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: var(--b);
+    }
+    .f-scroll {
+      max-height: 130px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .f-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      color: var(--text);
+      cursor: pointer;
+      padding: 2px 0;
+      user-select: none;
+    }
+    .f-item input[type=checkbox] {
+      width: 14px;
+      height: 14px;
+      accent-color: var(--accent);
+      cursor: pointer;
+      flex-shrink: 0;
+      margin: 0;
+      padding: 0;
+      border-radius: 3px;
+    }
+    .f-all {
+      font-weight: 700;
+      color: var(--accent);
+      padding-bottom: 5px;
+      margin-bottom: 2px;
+      border-bottom: var(--b);
+    }
+    @media (max-width: 600px) {
+      .f-cols { grid-template-columns: 1fr; }
+    }
+
     .modal {
       display: none;
       position: fixed;
@@ -1622,21 +1691,9 @@
           <input type="date" id="s-date" />
         </div>
         <div class="fg">
-          <label for="s-sector">Sector <span class="rq">*</span></label>
-          <select id="s-sector" onchange="onSessionSectorChange()">
-            <option value="">Choose Sector...</option>
-            <option>GUDAIBIYA</option>
-            <option>CASENO</option>
-            <option>HIDD</option>
-            <option>JUFFAIR</option>
-            <option>SALMABAD</option>
-            <option>SALMANIYA</option>
-            <option>BUDAYYA</option>
-            <option>KHALEEFA</option>
-            <option>SANAD</option>
-            <option>HAMAD TOWN</option>
-            <option>ISA TOWN</option>
-          </select>
+          <label>Sector(s) <span class="rq">*</span></label>
+          <div id="s-sector-checklist" style="border: 0.5px solid #c8c8c8; border-radius: var(--rs); padding: 10px; max-height: 120px; overflow-y: auto; background: #fff; display: flex; flex-direction: column; gap: 8px;">
+          </div>
         </div>
         <div class="fg">
           <label>Unit(s) <span class="rq">*</span></label>
@@ -2112,6 +2169,9 @@
       tb.innerHTML = dp.map(function (r, i) { return '<tr><td class="ic tm">' + (i + 1) + '</td><td>' + esc(r.name) + '</td><td class="tm">' + (esc(r.mobile) || '—') + '</td><td>' + esc(r.whatsapp) + '</td><td><span class="pill">' + esc(r.unit || '—') + '</span></td><td class="tm">' + fmtDate(r.date) + '</td></tr>'; }).join('');
     }
 
+    /* ── Admin sector/unit filter helpers ── */
+    var _admSectorsBuilt = false;
+    function buildAdmSectorChecklist() { /* unused — kept for safety */ }
     function rAdm() {
       var regs = gR(), sS = {}, uS = {};
       regs.forEach(function (r) { if (r.sector) sS[r.sector] = 1; if (r.unit) uS[r.unit] = 1; });
@@ -2128,7 +2188,6 @@
       var regs = gR();
       if (sec) regs = regs.filter(function(r) { return nm(r.sector) === nm(sec); });
       if (un) regs = regs.filter(function(r) { return nm(r.unit) === nm(un); });
-      
       var tb = document.getElementById('atb');
       if (!regs.length) { tb.innerHTML = '<tr><td colspan="8" class="et">No registrations found.</td></tr>'; return; }
       var dp = regs.slice().reverse();
@@ -2555,7 +2614,10 @@
       uSel.value = prevVal;
       var fu = uSel.value;
       
-      var sessions = gSessions().filter(function(s) { return nm(s.sector) === nm(sn); });
+      var sessions = gSessions().filter(function(s) {
+        var sectorsList = (s.sector || '').split(',').map(function(secItem) { return nm(secItem); });
+        return sectorsList.indexOf(nm(sn)) !== -1;
+      });
       if (fu) {
         sessions = sessions.filter(function(s) {
           var unitsList = (s.unit || '').split(',').map(function(u) { return nm(u); });
@@ -2571,11 +2633,8 @@
       var avg = completed.length > 0 ? Math.round(overallAttended / completed.length) : 0;
       
       var sectorRegs = gR().filter(function(r) { return nm(r.sector) === nm(sn); });
-      if (fu) {
-        sectorRegs = sectorRegs.filter(function(r) { return nm(r.unit) === nm(fu); });
-      }
-      var totalRegs = sectorRegs.length;
-      document.getElementById('sa-s2').textContent = avg + ' / ' + totalRegs;
+      if (fu) sectorRegs = sectorRegs.filter(function(r) { return nm(r.unit) === nm(fu); });
+      document.getElementById('sa-s2').textContent = avg + ' / ' + sectorRegs.length;
       
       var bestClass = '—';
       var bestCount = -1;
@@ -2590,13 +2649,22 @@
       renderCSSChart('sa-chart-card', completed, avg);
       renderSessionsGrid('sector-sessions-grid', 'sector-sessions-empty', sessions);
     }
+    window.renderSectorAttendance = function() {
+      var ss = gSs();
+      if (ss) rSectorAttendance(ss);
+    };
 
     function rAdminAttendance() {
       var sec = document.getElementById('ada-filter-sector').value;
       var un = document.getElementById('ada-filter-unit').value;
       
       var sessions = gSessions();
-      if (sec) sessions = sessions.filter(function(s) { return nm(s.sector) === nm(sec); });
+      if (sec) {
+        sessions = sessions.filter(function(s) {
+          var sectorsList = (s.sector || '').split(',').map(function(secItem) { return nm(secItem); });
+          return sectorsList.indexOf(nm(sec)) !== -1;
+        });
+      }
       if (un) {
         sessions = sessions.filter(function(s) {
           var unitsList = (s.unit || '').split(',').map(function(u) { return nm(u); });
@@ -2614,8 +2682,7 @@
       var adminRegs = gR();
       if (sec) adminRegs = adminRegs.filter(function(r) { return nm(r.sector) === nm(sec); });
       if (un) adminRegs = adminRegs.filter(function(r) { return nm(r.unit) === nm(un); });
-      var totalRegs = adminRegs.length;
-      document.getElementById('ada-s2').textContent = avg + ' / ' + totalRegs;
+      document.getElementById('ada-s2').textContent = avg + ' / ' + adminRegs.length;
       
       var bestClass = '—';
       var bestCount = -1;
@@ -2630,7 +2697,7 @@
       renderCSSChart('ada-chart-card', completed, avg);
       renderSessionsGrid('admin-sessions-grid', 'admin-sessions-empty', sessions);
     }
-
+    window.renderAdminAttendance = function() { rAdminAttendance(); };
     window.onAdminAttendanceSectorChange = function() {
       var sec = document.getElementById('ada-filter-sector').value;
       var uSel = document.getElementById('ada-filter-unit');
@@ -2643,7 +2710,7 @@
           uSel.appendChild(opt);
         });
       }
-      renderAdminAttendance();
+      rAdminAttendance();
     };
 
     function renderCSSChart(containerId, completed, avg) {
@@ -2852,15 +2919,31 @@
     window.openEditSessionModal = openEditSessionModal;
 
     function onSessionSectorChange(selectedUnits) {
-      var secVal = document.getElementById('s-sector').value;
+      var checkedSectors = [];
+      var ss = gSs();
+      if (ss && ss.role === 'sector') {
+        checkedSectors.push(ss.sector);
+      } else {
+        var checkedCbs = document.querySelectorAll('input[name="s-sectors-cb"]:checked');
+        checkedCbs.forEach(function(cb) {
+          checkedSectors.push(cb.value);
+        });
+      }
+      
       var checklist = document.getElementById('s-unit-checklist');
-      if (!secVal) {
-        checklist.innerHTML = '<div style="color: var(--t3); font-size: 13px;">Choose Sector first...</div>';
+      if (checkedSectors.length === 0) {
+        checklist.innerHTML = '<div style="color: var(--t3); font-size: 13px;">Choose Sector(s) first...</div>';
         return;
       }
-      var units = SU[secVal] || [];
+      
+      var allUnits = [];
+      checkedSectors.forEach(function(sec) {
+        var units = SU[sec] || [];
+        allUnits = allUnits.concat(units);
+      });
+      
       var selArr = selectedUnits || [];
-      checklist.innerHTML = units.map(function(u) {
+      checklist.innerHTML = allUnits.map(function(u) {
         var checked = selArr.indexOf(u) !== -1 ? ' checked' : '';
         return '<label style="display:flex; align-items:center; gap:8px; text-transform:none; font-weight:normal; margin-bottom:0; cursor:pointer;">' +
                '  <input type="checkbox" name="s-units-cb" value="' + esc(u) + '"' + checked + ' style="width:auto; margin:0;" />' +
@@ -2881,16 +2964,29 @@
       var submitBtn = document.querySelector('#sfm button[type="submit"]');
       var idInput = document.getElementById('s-id');
       
-      var secSel = document.getElementById('s-sector');
+      var sectorChecklist = document.getElementById('s-sector-checklist');
+      var sectors = Object.keys(SU);
       
       if (ss.role === 'sector') {
-        secSel.value = ss.sector;
-        secSel.disabled = true;
+        sectorChecklist.innerHTML = '<label style="display:flex; align-items:center; gap:8px; text-transform:none; font-weight:bold; margin-bottom:0; cursor:default;">' +
+                                    '  <input type="checkbox" checked disabled style="width:auto; margin:0;" />' +
+                                    '  <span>' + esc(ss.sector) + '</span>' +
+                                    '</label>';
         onSessionSectorChange();
       } else if (ss.role === 'admin') {
-        secSel.value = '';
-        secSel.disabled = false;
-        onSessionSectorChange();
+        var activeSectors = [];
+        if (s) {
+          activeSectors = (s.sector || '').split(',').map(function(item) { return item.trim(); });
+        }
+        
+        sectorChecklist.innerHTML = sectors.map(function(sec) {
+          var checked = activeSectors.indexOf(sec) !== -1 ? ' checked' : '';
+          return '<label style="display:flex; align-items:center; gap:8px; text-transform:none; font-weight:normal; margin-bottom:0; cursor:pointer;">' +
+                 '  <input type="checkbox" name="s-sectors-cb" value="' + esc(sec) + '"' + checked + ' style="width:auto; margin:0;" onchange="onSessionSectorChange()" />' +
+                 '  <span>' + esc(sec) + '</span>' +
+                 '</label>';
+        }).join('');
+        onSessionSectorChange(s ? (s.unit || '').split(',').map(function(item) { return item.trim(); }) : []);
       }
       
       if (s) {
@@ -2900,15 +2996,6 @@
         
         document.getElementById('s-class-num').value = s.classNumber;
         document.getElementById('s-date').value = s.date;
-        secSel.value = s.sector;
-        if (ss.role === 'sector') {
-          secSel.disabled = true;
-        } else {
-          secSel.disabled = false;
-        }
-        var selectedUnits = (s.unit || '').split(',').map(function(item) { return item.trim(); });
-        onSessionSectorChange(selectedUnits);
-        
         document.getElementById('s-venue').value = s.venue;
         document.getElementById('s-ustadh').value = s.ustadh;
         document.getElementById('s-time').value = s.startTime;
@@ -2939,7 +3026,18 @@
       var classNum = document.getElementById('s-class-num').value;
       var topic = classNum ? 'Class ' + classNum : '';
       var date = document.getElementById('s-date').value;
-      var sectorVal = document.getElementById('s-sector').value;
+      
+      var sectorVal = '';
+      var sectorsArray = [];
+      if (ss && ss.role === 'sector') {
+        sectorVal = ss.sector;
+      } else {
+        var checkedSectorsCbs = document.querySelectorAll('input[name="s-sectors-cb"]:checked');
+        checkedSectorsCbs.forEach(function(cb) {
+          sectorsArray.push(cb.value);
+        });
+        sectorVal = sectorsArray.join(', ');
+      }
       
       var checkedCbs = document.querySelectorAll('input[name="s-units-cb"]:checked');
       var unitsArray = [];
@@ -2953,6 +3051,10 @@
       var startTime = document.getElementById('s-time').value;
       var notes = document.getElementById('s-notes').value.trim();
       
+      if (sectorsArray.length === 0 && (!ss || ss.role !== 'sector')) {
+        alert('Please select at least one Sector.');
+        return;
+      }
       if (unitsArray.length === 0) {
         alert('Please select at least one Unit.');
         return;
