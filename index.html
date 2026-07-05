@@ -2822,7 +2822,8 @@
 
       grid.innerHTML = sorted.map(function(s, idx) {
         var isScheduled = s.status === 'scheduled';
-        var actionBtnText = isScheduled ? 'Mark Attendance' : 'View';
+        var isAdmin = (ss && ss.role === 'admin');
+        var actionBtnText = isScheduled ? 'Mark Attendance' : (isAdmin ? 'View / Edit' : 'View');
         var isLatest = idx === 0;
         
         var statusClass = 'completed';
@@ -3026,7 +3027,7 @@
         idInput.value = s.id;
         
         document.getElementById('s-class-num').value = s.classNumber;
-        document.getElementById('s-date').value = s.date;
+        document.getElementById('s-date').value = normalizeToYYYYMMDD(s.date);
         document.getElementById('s-venue').value = s.venue;
         document.getElementById('s-ustadh').value = s.ustadh;
         document.getElementById('s-time').value = normalizeToHHMM(s.startTime);
@@ -3044,6 +3045,31 @@
       document.getElementById('session-modal').classList.add('on');
     }
     window.openCreateSessionModal = openCreateSessionModal;
+
+    /* Normalize any date format to YYYY-MM-DD for date input pre-filling */
+    function normalizeToYYYYMMDD(dStr) {
+      if (!dStr) return '';
+      dStr = String(dStr).trim();
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dStr)) return dStr;
+      
+      var p = dStr.split(/[-/]/);
+      if (p.length === 3) {
+        if (p[0].length === 4) {
+          return p[0] + '-' + String(p[1]).padStart(2, '0') + '-' + String(p[2]).padStart(2, '0');
+        } else {
+          return p[2] + '-' + String(p[1]).padStart(2, '0') + '-' + String(p[0]).padStart(2, '0');
+        }
+      }
+      var d = new Date(dStr);
+      if (!isNaN(d.getTime())) {
+        var yyyy = d.getFullYear();
+        var mm = String(d.getMonth() + 1).padStart(2, '0');
+        var dd = String(d.getDate()).padStart(2, '0');
+        return yyyy + '-' + mm + '-' + dd;
+      }
+      return dStr;
+    }
+    window.normalizeToYYYYMMDD = normalizeToYYYYMMDD;
 
     function closeCreateSessionModal() {
       document.getElementById('session-modal').classList.remove('on');
@@ -3184,9 +3210,10 @@
       var iconPin = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px; color: var(--accent);"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>';
       var iconUser = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px; color: var(--t2);"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
       var iconHome = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px; color: var(--t2);"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>';
+      var iconClock = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px; color: var(--t2);"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
 
       infoDiv.innerHTML = '<div style="display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px 0;"><strong>Topic:</strong> &nbsp;' + esc(session.topic) + '</div>' +
-                          '<div style="margin-top: 4px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px 0;">' + iconCal + ' <strong>Date:</strong> &nbsp;' + fmtDate(session.date) + ' &middot; &nbsp;' + iconPin + ' ' + esc(session.venue) + '</div>' +
+                          '<div style="margin-top: 4px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px 0;">' + iconCal + ' <strong>Date:</strong> &nbsp;' + fmtDate(session.date) + ' &middot; &nbsp;' + iconClock + ' ' + fmtTime(session.startTime) + ' &middot; &nbsp;' + iconPin + ' ' + esc(session.venue) + '</div>' +
                           '<div style="margin-top: 4px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px 0;">' + iconUser + ' <strong>Ustadh:</strong> &nbsp;' + esc(session.ustadh) + ' &middot; &nbsp;' + iconHome + ' <strong>Unit:</strong> &nbsp;' + esc(session.unit) + '</div>';
       
       var regs = [];
@@ -3317,10 +3344,13 @@
     function openViewAttendanceModal(session) {
       openAttendanceModal(session);
       
-      document.querySelector('#attendance-modal h2').textContent = 'View Class Attendance';
+      var ss = gSs();
+      var isAdmin = (ss && ss.role === 'admin');
+      
+      document.querySelector('#attendance-modal h2').textContent = isAdmin ? 'View / Edit Attendance' : 'View Class Attendance';
       var endTimeInput = document.getElementById('att-end-time');
-      endTimeInput.value = session.endTime || '';
-      endTimeInput.disabled = true;
+      endTimeInput.value = normalizeToHHMM(session.endTime) || '';
+      endTimeInput.disabled = !isAdmin;
       
       var checklistWrapper = document.getElementById('att-checklist-wrapper');
       var manualWrapper = document.getElementById('att-manual-wrapper');
@@ -3344,15 +3374,25 @@
               badge.textContent = 'Absent';
             }
           }
-          cb.classList.add('disabled');
+          if (isAdmin) {
+            cb.classList.remove('disabled');
+          } else {
+            cb.classList.add('disabled');
+          }
         });
       } else {
         var manualCount = document.getElementById('att-manual-count');
         manualCount.value = session.attendedCount || 0;
-        manualCount.disabled = true;
+        manualCount.disabled = !isAdmin;
       }
       
-      document.querySelector('#attendance-modal button[type="submit"]').style.display = 'none';
+      var submitBtn = document.querySelector('#attendance-modal button[type="submit"]');
+      if (isAdmin) {
+        submitBtn.style.display = 'block';
+        submitBtn.textContent = 'Update Attendance';
+      } else {
+        submitBtn.style.display = 'none';
+      }
     }
     window.openViewAttendanceModal = openViewAttendanceModal;
 
