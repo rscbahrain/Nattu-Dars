@@ -1882,7 +1882,13 @@
     function fmtTime(tStr) {
       if (!tStr) return '';
       tStr = String(tStr).trim();
-      if (/^\d{2}\.\d{2}\s*(AM|PM)$/i.test(tStr)) return tStr.toUpperCase();
+      // Already formatted as HH:MM AM/PM
+      if (/^\d{1,2}:\d{2}\s*(AM|PM)$/i.test(tStr)) return tStr.toUpperCase();
+      // Legacy dot format HH.MM AM/PM — normalise to colon
+      if (/^\d{2}\.\d{2}\s*(AM|PM)$/i.test(tStr)) {
+        return tStr.replace('.', ':').toUpperCase();
+      }
+      // ISO datetime string e.g. 2026-07-05T08:30:00
       if (tStr.indexOf('T') !== -1 && tStr.indexOf(':') !== -1) {
         var timePart = tStr.split('T')[1];
         if (timePart) {
@@ -1893,12 +1899,11 @@
             var ampm = h >= 12 ? 'PM' : 'AM';
             h = h % 12;
             if (h === 0) h = 12;
-            var hh = String(h).padStart(2, '0');
-            var mm = String(m).padStart(2, '0');
-            return hh + '.' + mm + ' ' + ampm;
+            return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ' ' + ampm;
           }
         }
       }
+      // Plain HH:MM (24-hour from <input type="time">)
       var parts = tStr.split(':');
       if (parts.length >= 2) {
         var h = parseInt(parts[0], 10);
@@ -1907,14 +1912,40 @@
           var ampm = h >= 12 ? 'PM' : 'AM';
           h = h % 12;
           if (h === 0) h = 12;
-          var hh = String(h).padStart(2, '0');
-          var mm = String(m).padStart(2, '0');
-          return hh + '.' + mm + ' ' + ampm;
+          return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ' ' + ampm;
         }
       }
       return tStr;
     }
     window.fmtTime = fmtTime;
+
+    /* Convert any stored time value → 24-hour HH:MM for <input type="time"> */
+    function normalizeToHHMM(tStr) {
+      if (!tStr) return '';
+      tStr = String(tStr).trim();
+      // Already HH:MM or HH:MM:SS (24-hour) — strip seconds if present
+      if (/^\d{1,2}:\d{2}(:\d{2})?$/.test(tStr)) {
+        var parts = tStr.split(':');
+        return String(parseInt(parts[0], 10)).padStart(2, '0') + ':' + parts[1].padStart(2, '0');
+      }
+      // HH:MM AM/PM or HH.MM AM/PM
+      var ampmMatch = tStr.match(/^(\d{1,2})[.:](\d{2})\s*(AM|PM)$/i);
+      if (ampmMatch) {
+        var h = parseInt(ampmMatch[1], 10);
+        var m = parseInt(ampmMatch[2], 10);
+        var ap = ampmMatch[3].toUpperCase();
+        if (ap === 'AM') { if (h === 12) h = 0; }
+        else { if (h !== 12) h += 12; }
+        return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+      }
+      // ISO datetime e.g. 2026-07-05T08:30:00
+      if (tStr.indexOf('T') !== -1) {
+        var tp = tStr.split('T')[1];
+        if (tp) return normalizeToHHMM(tp.substring(0, 5));
+      }
+      return tStr;
+    }
+    window.normalizeToHHMM = normalizeToHHMM;
 
     function getSessionTimestamp(dateStr, timeStr) {
       if (!dateStr) return 0;
@@ -2745,7 +2776,7 @@
         html += '    <span class="bar-label-class">Class ' + clsNum + '</span>';
         html += '    <div class="chart-tooltip">';
         html += '      <strong>Topic:</strong> ' + esc(s.topic) + '<br>';
-        html += '      <strong>Date:</strong> ' + esc(s.date) + '<br>';
+        html += '      <strong>Date:</strong> ' + esc(fmtDate(s.date)) + '<br>';
         html += '      <strong>Venue:</strong> ' + esc(s.venue) + '<br>';
         html += '      <strong>Ustadh:</strong> ' + esc(s.ustadh) + '<br>';
         html += '      <strong>Attended:</strong> ' + count;
@@ -2998,7 +3029,7 @@
         document.getElementById('s-date').value = s.date;
         document.getElementById('s-venue').value = s.venue;
         document.getElementById('s-ustadh').value = s.ustadh;
-        document.getElementById('s-time').value = s.startTime;
+        document.getElementById('s-time').value = normalizeToHHMM(s.startTime);
         document.getElementById('s-notes').value = s.notes || '';
       } else {
         titleEl.textContent = 'Create New Session';
