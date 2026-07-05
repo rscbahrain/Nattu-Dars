@@ -2730,6 +2730,8 @@
       renderSessionsGrid('admin-sessions-grid', 'admin-sessions-empty', sessions);
     }
     window.renderAdminAttendance = function() { rAdminAttendance(); };
+
+    // Unused attendance chart helpers cleared
     window.onAdminAttendanceSectorChange = function() {
       var sec = document.getElementById('ada-filter-sector').value;
       var uSel = document.getElementById('ada-filter-unit');
@@ -2794,6 +2796,8 @@
       html += '</div>';
       container.innerHTML = html;
     }
+
+
 
     function renderSessionsGrid(gridId, emptyId, sessions) {
       var grid = document.getElementById(gridId);
