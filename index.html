@@ -2594,34 +2594,60 @@
     });
     document.getElementById('rfm').addEventListener('submit', function (e) {
       e.preventDefault();
-      var name = document.getElementById('fn').value.trim();
-      var mob = document.getElementById('fm').value.trim();
-      var wa = document.getElementById('fw').value.trim();
-      var sec = document.getElementById('fs').value;
-      var un = document.getElementById('fu').value;
-      document.getElementById('fn').classList.remove('err'); document.getElementById('en').classList.remove('show');
-      document.getElementById('fw').classList.remove('err'); document.getElementById('ew').classList.remove('show');
-      document.getElementById('fm').classList.remove('err'); document.getElementById('em').classList.remove('show');
-      document.getElementById('fs').classList.remove('err'); document.getElementById('es').classList.remove('show');
-      document.getElementById('fu').classList.remove('err'); document.getElementById('eu').classList.remove('show');
+      var fnEl = document.getElementById('fn');
+      var fmEl = document.getElementById('fm');
+      var fwEl = document.getElementById('fw');
+      var fsEl = document.getElementById('fs');
+      var fuEl = document.getElementById('fu');
+      
+      var name = fnEl ? fnEl.value.trim() : '';
+      var mob = fmEl ? fmEl.value.trim() : '';
+      var wa = fwEl ? fwEl.value.trim() : '';
+      var sec = fsEl ? fsEl.value : '';
+      var un = fuEl ? fuEl.value : '';
+      
+      if (fnEl) fnEl.classList.remove('err');
+      var enEl = document.getElementById('en'); if (enEl) enEl.classList.remove('show');
+      
+      if (fwEl) fwEl.classList.remove('err');
+      var ewEl = document.getElementById('ew'); if (ewEl) ewEl.classList.remove('show');
+      
+      if (fmEl) fmEl.classList.remove('err');
+      var emEl = document.getElementById('em'); if (emEl) emEl.classList.remove('show');
+      
+      if (fsEl) fsEl.classList.remove('err');
+      var esEl = document.getElementById('es'); if (esEl) esEl.classList.remove('show');
+      
+      if (fuEl) fuEl.classList.remove('err');
+      var euEl = document.getElementById('eu'); if (euEl) euEl.classList.remove('show');
+      
       var ok = true;
-      if (!name) { document.getElementById('fn').classList.add('err'); document.getElementById('en').classList.add('show'); ok = false; }
-      if (!sec) { document.getElementById('fs').classList.add('err'); document.getElementById('es').classList.add('show'); ok = false; }
-      if (!un) { document.getElementById('fu').classList.add('err'); document.getElementById('eu').classList.add('show'); ok = false; }
+      if (!name) { if (fnEl) fnEl.classList.add('err'); if (enEl) { enEl.textContent = 'Name is required.'; enEl.classList.add('show'); } ok = false; }
+      if (!sec) { if (fsEl) fsEl.classList.add('err'); if (esEl) esEl.classList.add('show'); ok = false; }
+      if (!un) { if (fuEl) fuEl.classList.add('err'); if (euEl) euEl.classList.add('show'); ok = false; }
 
       var cleanMob = mob.replace(/\D/g, '');
       var cleanWa = wa.replace(/\D/g, '');
 
       if (mob && (mob.length < 8 || mob.length > 13)) {
-        document.getElementById('fm').classList.add('err');
+        if (fmEl) fmEl.classList.add('err');
         alert('Mobile number must be between 8 and 13 characters long.');
         ok = false;
       }
 
       if (!wa) {
-        document.getElementById('fw').classList.add('err');
-        document.getElementById('ew').textContent = 'WhatsApp number is required.';
-        document.getElementById('ew').classList.add('show');
+        if (fwEl) fwEl.classList.add('err');
+        if (ewEl) {
+          ewEl.textContent = 'WhatsApp number is required.';
+          ewEl.classList.add('show');
+        }
+        ok = false;
+      } else if (cleanWa.length < 8 || cleanWa.length > 15) {
+        if (fwEl) fwEl.classList.add('err');
+        if (ewEl) {
+          ewEl.textContent = 'WhatsApp number must contain between 8 and 15 digits.';
+          ewEl.classList.add('show');
+        }
         ok = false;
       }
       
@@ -2633,8 +2659,7 @@
           return (existingMob && existingMob === cleanMob) || (existingWa && existingWa === cleanMob);
         });
         if (isMobExists) {
-          document.getElementById('fm').classList.add('err');
-          var emEl = document.getElementById('em');
+          if (fmEl) fmEl.classList.add('err');
           if (emEl) {
             emEl.textContent = 'This number already exists.';
             emEl.classList.add('show');
@@ -2650,8 +2675,7 @@
           return (existingMob && existingMob === cleanWa) || (existingWa && existingWa === cleanWa);
         });
         if (isWaExists) {
-          document.getElementById('fw').classList.add('err');
-          var ewEl = document.getElementById('ew');
+          if (fwEl) fwEl.classList.add('err');
           if (ewEl) {
             ewEl.textContent = 'This number already exists.';
             ewEl.classList.add('show');
