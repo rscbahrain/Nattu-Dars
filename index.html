@@ -2012,7 +2012,6 @@
         s.startTime = s.starttime;
         s.classNumber = s.classnumber;
         s.endTime = s.endtime;
-        s.attendedCount = parseInt(s.attendedcount || 0);
         if (typeof s.attendedmembers === 'string') {
           try { s.attendedMembers = JSON.parse(s.attendedmembers); }
           catch(e) { s.attendedMembers = []; }
@@ -2020,6 +2019,18 @@
           s.attendedMembers = s.attendedmembers;
         } else {
           s.attendedMembers = [];
+        }
+        
+        if (s.status === 'completed') {
+          var sessionUnits = (s.unit || '').split(',').map(function(u) { return nm(u); });
+          var matchedAttended = gR().filter(function(r) {
+            var inUnit = sessionUnits.indexOf(nm(r.unit)) !== -1;
+            var attended = s.attendedMembers && s.attendedMembers.some(function(item) { return String(item) === String(r.id); });
+            return inUnit && attended;
+          });
+          s.attendedCount = matchedAttended.length;
+        } else {
+          s.attendedCount = 0;
         }
       });
       return sessions;
@@ -2331,7 +2342,9 @@
       var s = arr.find(function(item) { return String(item.id) === String(sessionId); });
       if (!s) return;
       var sessionUnits = (s.unit || '').split(',').map(function(u) { return nm(u); });
-      var regs = gR().filter(function(r) { return sessionUnits.indexOf(nm(r.unit)) !== -1; });
+      var regs = gR().filter(function(r) {
+        return sessionUnits.indexOf(nm(r.unit)) !== -1;
+      });
       if (!regs.length) { alert('No registered members found for this session\'s units.'); return; }
       regs.sort(function(a, b) {
         var uComp = nm(a.unit).localeCompare(nm(b.unit));
@@ -2340,7 +2353,7 @@
       });
       var hdrs = ['#', 'Name', 'WhatsApp', 'Sector', 'Unit', 'Status'];
       var rows = regs.map(function(r, i) {
-        var attended = s.attendedMembers && s.attendedMembers.indexOf(String(r.id)) !== -1;
+        var attended = s.attendedMembers && s.attendedMembers.some(function(item) { return String(item) === String(r.id); });
         return [i + 1, r.name, r.whatsapp, r.sector, r.unit, attended ? 'Attended' : 'Absent'];
       });
       var filename = 'attendance_' + s.topic.toLowerCase().replace(/ /g, '_') + '_' + fmtDate(s.date).replace(/-/g, '_') + '.csv';
@@ -2354,7 +2367,9 @@
       if (!s) return;
       
       var sessionUnits = (s.unit || '').split(',').map(function(u) { return nm(u); });
-      var regs = gR().filter(function(r) { return sessionUnits.indexOf(nm(r.unit)) !== -1; });
+      var regs = gR().filter(function(r) {
+        return sessionUnits.indexOf(nm(r.unit)) !== -1;
+      });
       
       regs.sort(function(a, b) {
         var uComp = nm(a.unit).localeCompare(nm(b.unit));
@@ -2372,10 +2387,10 @@
       var absentCount = 0;
       
       if (!regs.length) {
-        tbody.innerHTML = '<tr><td colspan="4" style="padding:20px; text-align:center; color:var(--muted);">No registered members in these units.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" style="padding:20px; text-align:center; color:var(--muted);">No registered members found for this session.</td></tr>';
       } else {
         regs.forEach(function(r, idx) {
-          var attended = s.attendedMembers && s.attendedMembers.indexOf(String(r.id)) !== -1;
+          var attended = s.attendedMembers && s.attendedMembers.some(function(item) { return String(item) === String(r.id); });
           if (attended) presentCount++; else absentCount++;
           
           var badgeClass = attended ? 'present' : 'absent';
@@ -2460,7 +2475,7 @@
           var classSess = allSessions.filter(function(s) { return parseInt(s.classNumber) === cNum; });
           
           var attendedSession = classSess.find(function(s) {
-            return s.attendedMembers && s.attendedMembers.indexOf(String(r.id)) !== -1;
+            return s.attendedMembers && s.attendedMembers.some(function(item) { return String(item) === String(r.id); });
           });
           
           var wasScheduledAny = classSess.some(function(s) {
@@ -3602,7 +3617,7 @@
           var cb = row.querySelector('.checklist-cb');
           var mId = cb.getAttribute('data-member-id');
           var badge = row.querySelector('.att-status-badge');
-          if (session.attendedMembers && session.attendedMembers.indexOf(mId) !== -1) {
+          if (session.attendedMembers && session.attendedMembers.some(function(item) { return String(item) === String(mId); })) {
             cb.classList.add('checked');
             if (badge) {
               badge.className = 'att-status-badge present';
