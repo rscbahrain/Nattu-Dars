@@ -1139,7 +1139,6 @@
               <label for="fm">Mobile Number</label>
               <input type="tel" id="fm" placeholder="" oninput="this.value = this.value.replace(/[^0-9+]/g, '')" maxlength="13" />
               <div class="tm" style="font-size: 11px; margin-top: 4px;">(with country code)</div>
-              <div class="ferr" id="em">This number already exists.</div>
             </div>
             <div class="fg">
               <label for="fw">WhatsApp Number <span class="rq">*</span></label>
@@ -2629,7 +2628,7 @@
       var cleanMob = mob.replace(/\D/g, '');
       var cleanWa = wa.replace(/\D/g, '');
 
-      if (mob && (mob.length < 8 || mob.length > 13)) {
+      if (cleanMob && (cleanMob.length < 8 || cleanMob.length > 13)) {
         if (fmEl) fmEl.classList.add('err');
         alert('Mobile number must be between 8 and 13 characters long.');
         ok = false;
@@ -2649,39 +2648,6 @@
           ewEl.classList.add('show');
         }
         ok = false;
-      }
-      
-      var allRegs = gR();
-      if (cleanMob) {
-        var isMobExists = allRegs.some(function(r) {
-          var existingMob = (r.mobile || '').replace(/\D/g, '');
-          var existingWa = (r.whatsapp || '').replace(/\D/g, '');
-          return (existingMob && existingMob === cleanMob) || (existingWa && existingWa === cleanMob);
-        });
-        if (isMobExists) {
-          if (fmEl) fmEl.classList.add('err');
-          if (emEl) {
-            emEl.textContent = 'This number already exists.';
-            emEl.classList.add('show');
-          }
-          ok = false;
-        }
-      }
-      
-      if (cleanWa) {
-        var isWaExists = allRegs.some(function(r) {
-          var existingMob = (r.mobile || '').replace(/\D/g, '');
-          var existingWa = (r.whatsapp || '').replace(/\D/g, '');
-          return (existingMob && existingMob === cleanWa) || (existingWa && existingWa === cleanWa);
-        });
-        if (isWaExists) {
-          if (fwEl) fwEl.classList.add('err');
-          if (ewEl) {
-            ewEl.textContent = 'This number already exists.';
-            ewEl.classList.add('show');
-          }
-          ok = false;
-        }
       }
       
       if (!ok) return;
@@ -2788,36 +2754,9 @@
       }
       var cleanMob = mob.replace(/\D/g, '');
       var cleanWa = wa.replace(/\D/g, '');
-      if (mob && (mob.length < 8 || mob.length > 13)) {
+      if (cleanMob && (cleanMob.length < 8 || cleanMob.length > 13)) {
         alert('Mobile number must be between 8 and 13 characters long.');
         return;
-      }
-      
-      var regs = gR();
-      if (cleanMob) {
-        var isMobExists = regs.some(function(r) {
-          if (String(r.id) === String(id)) return false;
-          var existingMob = (r.mobile || '').replace(/\D/g, '');
-          var existingWa = (r.whatsapp || '').replace(/\D/g, '');
-          return (existingMob && existingMob === cleanMob) || (existingWa && existingWa === cleanMob);
-        });
-        if (isMobExists) {
-          alert('This mobile number is already registered for another student! One registration is allowed per number.');
-          return;
-        }
-      }
-      
-      if (cleanWa) {
-        var isWaExists = regs.some(function(r) {
-          if (String(r.id) === String(id)) return false;
-          var existingMob = (r.mobile || '').replace(/\D/g, '');
-          var existingWa = (r.whatsapp || '').replace(/\D/g, '');
-          return (existingMob && existingMob === cleanWa) || (existingWa && existingWa === cleanWa);
-        });
-        if (isWaExists) {
-          alert('This WhatsApp number is already registered for another student! One registration is allowed per number.');
-          return;
-        }
       }
       
       var index = regs.findIndex(function (item) { return String(item.id) === String(id); });
